@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Junior UI/UX Designer portfolio — crafting intuitive, research-driven digital experiences." />
+<meta name="keywords" content="UI UX Designer, Junior UX Designer, UX Research, Figma, Portfolio" />
+<meta name="author" content="Rahul Dhariwal" />
+<meta property="og:title" content="Rahul Dhariwal — Junior UI/UX Designer" />
+<meta property="og:description" content="Designing intuitive digital experiences that solve real user problems." />
+<meta property="og:type" content="website" />
+<title>Rahul Dhariwal — Junior UI/UX Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font: 'Poppins', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --max-w: 1280px;
+  --nav-h: 72px;
+}
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --bg-soft: #111111;
+  --bg-elev: #161616;
+  --surface: rgba(255,255,255,0.03);
+  --surface-hover: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --text: #fafafa;
+  --text-muted: #8a8a8a;
+  --text-dim: #555555;
+  --accent: #ffffff;
+  --accent-soft: rgba(255,255,255,0.08);
+  --gradient: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+}
+[data-theme="light"] {
+  --bg: #fafafa;
+  --bg-soft: #ffffff;
+  --bg-elev: #ffffff;
+  --surface: rgba(0,0,0,0.02);
+  --surface-hover: rgba(0,0,0,0.04);
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.16);
+  --text: #0a0a0a;
+  --text-muted: #666666;
+  --text-dim: #999999;
+  --accent: #0a0a0a;
+  --accent-soft: rgba(0,0,0,0.05);
+  --gradient: linear-gradient(135deg, #0a0a0a 0%, #4a4a4a 100%);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
+  overflow-x: hidden;
+  font-weight: 400;
+  font-size: 16px;
+}
+/* Hide default cursor on desktop when custom cursor is active */
+@media (hover: hover) and (pointer: fine) {
+  body.custom-cursor-active,
+  body.custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+p { margin: 0; }
+ul { list-style: none; }
+::selection { background: var(--accent); color: var(--bg); }
+.container { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 0 32px; }
+
+/* =========================
+   CUSTOM INTERACTIVE CURSOR
+   ========================= */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  transition: opacity 0.2s, width 0.2s var(--ease), height 0.2s var(--ease);
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(255,255,255,0.7);
+  transition: width 0.35s var(--ease), height 0.35s var(--ease),
+              border-color 0.35s var(--ease), background-color 0.35s var(--ease),
+              opacity 0.2s;
+}
+.cursor-ring.hover {
+  width: 64px;
+  height: 64px;
+  border-color: rgba(255,255,255,1);
+  background: rgba(255,255,255,0.08);
+}
+.cursor-ring.click {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+}
+.cursor-dot.hover {
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+@media (hover: none), (pointer: coarse), (max-width: 900px) {
+  .cursor-dot, .cursor-ring { display: none !important; }
+}
+
+/* =========================
+   PAGE TRANSITION
+   ========================= */
+.page-transition {
+  position: fixed; inset: 0;
+  background: var(--accent);
+  z-index: 500; pointer-events: none;
+  transform: translateY(100%);
+  transition: transform 0.6s var(--ease-out);
+}
+.page-transition.active { transform: translateY(0); }
+
+/* =========================
+   PAGE SYSTEM — FAST LOAD FIX
+   ========================= */
+.page {
+  display: none;
+  min-height: 100vh;
+  padding: calc(var(--nav-h) + 80px) 0 80px;
+  position: relative; z-index: 1;
+  opacity: 1; /* Always visible when active */
+}
+.page.active { display: block; }
+/* Animation only plays when navigating between pages, NOT on first load */
+.page.page-entering {
+  animation: pageIn 0.6s var(--ease-out) both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   NAVIGATION
+   ========================= */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100; padding: 0 32px;
+  height: var(--nav-h);
+  display: flex; align-items: center;
+  transition: all 0.35s var(--ease);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  width: 100%; max-width: var(--max-w); margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.logo {
+  font-size: 1rem; font-weight: 500; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.logo:hover { opacity: 0.7; }
+.logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.nav-links { display: flex; gap: 4px; align-items: center; }
+.nav-link {
+  padding: 8px 16px; font-size: 0.875rem; font-weight: 400;
+  color: var(--text-muted); border-radius: 999px;
+  transition: color 0.25s, background 0.25s;
+  cursor: pointer; position: relative;
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.active { color: var(--text); background: var(--surface); }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid var(--border); background: transparent;
+  transition: all 0.25s var(--ease);
+}
+.theme-toggle:hover { background: var(--surface); border-color: var(--border-strong); }
+.theme-toggle svg { width: 16px; height: 16px; }
+.theme-toggle .sun { display: none; }
+[data-theme="light"] .theme-toggle .sun { display: block; }
+[data-theme="light"] .theme-toggle .moon { display: none; }
+.menu-btn {
+  display: none; width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--border); align-items: center; justify-content: center;
+}
+.menu-btn span {
+  display: block; width: 14px; height: 1.5px; background: var(--text);
+  position: relative; transition: transform 0.3s;
+}
+.menu-btn span::before, .menu-btn span::after {
+  content: ""; position: absolute; left: 0; width: 14px; height: 1.5px;
+  background: var(--text); transition: transform 0.3s;
+}
+.menu-btn span::before { top: -4px; }
+.menu-btn span::after { top: 4px; }
+.menu-btn.open span { background: transparent; }
+.menu-btn.open span::before { top: 0; transform: rotate(45deg); }
+.menu-btn.open span::after { top: 0; transform: rotate(-45deg); }
+@media (max-width: 860px) {
+  .nav, .container { padding-left: 20px; padding-right: 20px; }
+  .nav-links {
+    position: fixed; top: calc(var(--nav-h) - 4px); left: 20px; right: 20px;
+    flex-direction: column; align-items: stretch;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 16px; padding: 8px; gap: 2px;
+    transform: translateY(-10px); opacity: 0; pointer-events: none;
+    transition: all 0.3s var(--ease);
+  }
+  .nav-links.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .nav-link { padding: 14px 16px; border-radius: 10px; text-align: left; }
+  .menu-btn { display: flex; }
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 24px; border-radius: 999px;
+  font-size: 0.875rem; font-weight: 500;
+  transition: all 0.3s var(--ease);
+  border: 1px solid transparent; white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-ghost { background: transparent; border-color: var(--border-strong); color: var(--text); }
+.btn-ghost:hover { background: var(--surface); transform: translateY(-2px); }
+.btn svg { width: 14px; height: 14px; }
+
+/* =========================
+   SECTION HEAD
+   ========================= */
+.section-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 0.75rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--text-muted); margin-bottom: 24px;
+}
+.section-label::before { content: ""; width: 24px; height: 1px; background: var(--text-muted); }
+.section-title {
+  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 600;
+  letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 20px;
+}
+.section-sub { color: var(--text-muted); font-size: 1rem; max-width: 560px; line-height: 1.6; }
+
+/* =========================
+   HERO
+   ========================= */
+.hero {
+  min-height: calc(100vh - var(--nav-h) - 80px);
+  display: flex; flex-direction: column; justify-content: center; padding: 40px 0;
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 0.8rem;
+  color: var(--text-muted); margin-bottom: 32px; letter-spacing: 0.05em;
+}
+.hero-title {
+  font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 600;
+  letter-spacing: -0.04em; line-height: 1; margin-bottom: 32px; max-width: 1000px;
+}
+.hero-title .italic { font-style: italic; font-weight: 400; color: var(--text-muted); }
+.hero-title .accent {
+  background: var(--gradient); -webkit-background-clip: text;
+  background-clip: text; color: transparent;
+}
+.hero-lead {
+  font-size: 1.125rem; color: var(--text-muted);
+  max-width: 560px; margin-bottom: 48px; line-height: 1.6;
+}
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px; }
+.availability {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 10px 18px 10px 14px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px;
+  font-size: 0.84rem; color: var(--text-muted);
+}
+.availability .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.2); animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,0.05); }
+}
+.hero-letter {
+  position: absolute; right: -5%; top: 50%; transform: translateY(-50%);
+  font-size: clamp(20rem, 40vw, 40rem); font-weight: 800; line-height: 0.8;
+  color: transparent; -webkit-text-stroke: 1px var(--border);
+  pointer-events: none; user-select: none; opacity: 0.5; z-index: 0;
+}
+
+/* =========================
+   ABOUT
+   ========================= */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.about-text p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.05rem; line-height: 1.7; }
+.about-text p strong { color: var(--text); font-weight: 500; }
+.about-highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.highlight-card {
+  padding: 24px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; transition: all 0.3s var(--ease);
+}
+.highlight-card:hover { background: var(--surface-hover); border-color: var(--border-strong); transform: translateY(-3px); }
+.highlight-card .letter { font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim); margin-bottom: 16px; letter-spacing: 0.1em; }
+.highlight-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+.highlight-card p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+@media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+/* =========================
+   EXPERIENCE
+   ========================= */
+.timeline { position: relative; padding-left: 48px; }
+.timeline::before { content: ""; position: absolute; left: 8px; top: 12px; bottom: 12px; width: 1px; background: var(--border); }
+.timeline-item {
+  position: relative; padding: 28px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 16px;
+  margin-bottom: 20px; transition: all 0.3s var(--ease);
+}
+.timeline-item:hover { background: var(--surface-hover); border-color: var(--border-strong); transform: translateX(4px); }
+.timeline-item::before {
+  content: ""; position: absolute; left: -44px; top: 32px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent);
+}
+.timeline-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+.timeline-head h3 { font-weight: 600; font-size: 1.1rem; }
+.timeline-meta { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.05em; }
+.timeline-desc { color: var(--text-muted); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.6; }
+.timeline-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.timeline-tags span {
+  font-family: var(--mono); font-size: 0.7rem; padding: 4px 10px;
+  background: var(--bg-elev); border: 1px solid var(--border);
+  border-radius: 999px; color: var(--text-muted); letter-spacing: 0.05em;
+}
+
+/* =========================
+   SKILLS
+   ========================= */
+.skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.skill-group {
+  padding: 32px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; transition: all 0.3s var(--ease);
+  position: relative; overflow: hidden;
+}
+.skill-group::before {
+  content: attr(data-letter); position: absolute; right: -10px; bottom: -40px;
+  font-size: 10rem; font-weight: 800; line-height: 1;
+  color: var(--accent); opacity: 0.04; pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+.skill-group:hover { background: var(--surface-hover); transform: translateY(-4px); border-color: var(--border-strong); }
+.skill-group:hover::before { opacity: 0.08; }
+.skill-group h3 { font-weight: 600; font-size: 1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.skill-group h3 .num { font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.1em; }
+.skill-list { display: flex; flex-direction: column; gap: 10px; }
+.skill-list li { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text-muted); }
+.skill-list li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+@media (max-width: 900px) { .skills-grid { grid-template-columns: 1fr; } }
+
+/* =========================
+   PROJECTS
+   ========================= */
+.projects-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+.filter-btn {
+  padding: 8px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 500;
+  color: var(--text-muted); background: transparent; border: 1px solid var(--border);
+  transition: all 0.25s var(--ease);
+}
+.filter-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.project-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  transition: all 0.4s var(--ease); display: flex; flex-direction: column;
+  cursor: pointer; position: relative;
+}
+.project-card:hover { transform: translateY(-6px); border-color: var(--border-strong); }
+.project-cover {
+  aspect-ratio: 16/10; background: var(--bg-elev);
+  position: relative; overflow: hidden; display: grid; place-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.project-cover .big-letter {
+  font-size: 12rem; font-weight: 800; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1px var(--border-strong);
+  transition: all 0.4s var(--ease);
+}
+.project-card:hover .big-letter { transform: scale(1.1); -webkit-text-stroke-color: var(--accent); }
+.project-cover img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.project-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+.project-category {
+  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 10px;
+}
+.project-body h3 { font-size: 1.25rem; margin-bottom: 12px; font-weight: 600; }
+.project-body .project-brief { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+.project-link {
+  margin-top: auto; display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; color: var(--text); font-weight: 500;
+  padding-top: 16px; border-top: 1px solid var(--border);
+  transition: gap 0.3s var(--ease);
+}
+.project-card:hover .project-link { gap: 14px; }
+@media (max-width: 860px) { .projects-grid { grid-template-columns: 1fr; } }
+
+/* =========================
+   PROJECT DETAIL / CASE STUDY
+   ========================= */
+.case-study { max-width: 860px; margin: 0 auto; }
+.case-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+  margin-bottom: 48px; transition: color 0.2s, gap 0.3s var(--ease);
+  cursor: pointer;
+}
+.case-back:hover { color: var(--text); gap: 12px; }
+.case-hero { margin-bottom: 64px; }
+.case-hero .case-category {
+  font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--text-dim); margin-bottom: 16px;
+}
+.case-hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700;
+  letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 24px;
+}
+.case-hero .case-intro {
+  font-size: 1.1rem; color: var(--text-muted); line-height: 1.7; max-width: 680px;
+}
+.case-cover-img {
+  width: 100%; aspect-ratio: 16/9; background: var(--bg-elev);
+  border: 1px solid var(--border); border-radius: 20px;
+  margin-bottom: 64px; display: grid; place-items: center;
+  position: relative; overflow: hidden;
+}
+.case-cover-img .big-num {
+  font-size: 14rem; font-weight: 800; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1px var(--border-strong);
+}
+.case-cover-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.case-img-container {
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.case-img-container img {
+  width: 100%; height: auto; border-radius: 16px;
+  border: 1px solid var(--border); display: block; background: var(--bg-elev);
+}
+.case-section { margin-bottom: 56px; }
+.case-section-label {
+  font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--text-dim); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.case-section-label::before { content: ""; width: 20px; height: 1px; background: var(--text-dim); }
+.case-section h3 {
+  font-size: 1.5rem; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.02em;
+}
+.case-section p {
+  font-size: 1rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 16px;
+}
+.case-section p:last-child { margin-bottom: 0; }
+.case-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.case-tags span {
+  font-family: var(--mono); font-size: 0.72rem; padding: 6px 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 999px; color: var(--text-muted); letter-spacing: 0.05em;
+}
+.case-img-placeholder {
+  width: 100%; aspect-ratio: 16/9; background: var(--surface);
+  border: 1px dashed var(--border-strong); border-radius: 16px;
+  display: grid; place-items: center; margin: 24px 0;
+}
+.case-img-placeholder span {
+  font-family: var(--mono); font-size: 0.78rem; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.15em;
+}
+.case-divider {
+  width: 100%; height: 1px; background: var(--border); margin: 56px 0;
+}
+.case-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 32px 0; border-top: 1px solid var(--border); margin-top: 64px;
+}
+.case-nav-item {
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.case-nav-item:hover { opacity: 0.7; }
+.case-nav-item .dir {
+  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.15em; color: var(--text-dim);
+}
+.case-nav-item .title { font-size: 1rem; font-weight: 600; }
+.case-nav-item.next { text-align: right; }
+
+/* =========================
+   PROCESS
+   ========================= */
+.process-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.process-step {
+  padding: 28px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; transition: all 0.3s var(--ease); position: relative;
+}
+.process-step:hover { background: var(--surface-hover); transform: translateY(-4px); border-color: var(--border-strong); }
+.process-step .step-num { font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 20px; display: block; }
+.process-step h4 { font-weight: 600; font-size: 1.05rem; margin-bottom: 10px; }
+.process-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+/* =========================
+   CONTACT
+   ========================= */
+.contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start; }
+.contact-info { display: flex; flex-direction: column; gap: 12px; }
+.contact-item {
+  padding: 20px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; display: flex; align-items: center; gap: 16px;
+  transition: all 0.3s var(--ease);
+}
+.contact-item:hover { background: var(--surface-hover); transform: translateX(4px); border-color: var(--border-strong); }
+.contact-item .icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--accent-soft); display: grid; place-items: center; flex-shrink: 0;
+}
+.contact-item .label {
+  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 2px;
+}
+.contact-item .value { font-size: 0.92rem; color: var(--text); }
+.contact-form {
+  padding: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-field { margin-bottom: 16px; }
+.form-field label {
+  display: block; font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+  color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.1em;
+}
+.form-field input, .form-field textarea {
+  width: 100%; padding: 14px 16px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-family: var(--font); font-size: 0.9rem;
+  transition: all 0.25s var(--ease);
+}
+.form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--accent); }
+.form-field textarea { resize: vertical; min-height: 120px; }
+@media (max-width: 860px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 32px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+.footer { padding: 60px 0 40px; border-top: 1px solid var(--border); margin-top: 80px; position: relative; z-index: 1; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-copy { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.02em; }
+.footer-socials { display: flex; gap: 8px; }
+.footer-socials a {
+  width: 36px; height: 36px; border-radius: 50%; background: transparent;
+  border: 1px solid var(--border); display: grid; place-items: center;
+  color: var(--text-muted); transition: all 0.25s var(--ease);
+}
+.footer-socials a:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+.footer-socials svg { width: 14px; height: 14px; }
+
+/* =========================
+   SCROLL REVEAL
+   ========================= */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal.delay-1 { transition-delay: 0.1s; }
+.reveal.delay-2 { transition-delay: 0.2s; }
+.reveal.delay-3 { transition-delay: 0.3s; }
+.reveal.delay-4 { transition-delay: 0.4s; }
+
+@media (max-width: 600px) {
+  .container { padding: 0 20px; }
+  .contact-form { padding: 24px; }
+  .hero-ctas .btn { padding: 12px 20px; font-size: 0.85rem; }
+  .hero-letter { display: none; }
+  .case-nav { flex-direction: column; gap: 24px; align-items: flex-start; }
+  .case-nav-item.next { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Interactive Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="page-transition" id="pageTransition"></div>
+
+<!-- NAVIGATION -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="logo" data-page="home">
+      <span class="logo-dot"></span>
+      <span>Rahul Dhariwal</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-link active" data-page="home">Home</div>
+      <div class="nav-link" data-page="projects">Work</div>
+      <div class="nav-link" data-page="about">About</div>
+      <div class="nav-link" data-page="experience">Experience</div>
+      <div class="nav-link" data-page="skills">Skills</div>
+      <div class="nav-link" data-page="process">Process</div>
+      <div class="nav-link" data-page="contact">Contact</div>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== PAGE: HOME ==================== -->
+<main class="page active" id="page-home">
+  <div class="container">
+    <div class="hero">
+      <div class="hero-letter">U</div>
+      <div class="hero-eyebrow reveal">Junior UI/UX Designer · Available for opportunities</div>
+      <h1 class="hero-title reveal delay-1">
+        Designing <span class="italic">intuitive</span> digital experiences that <span class="accent">solve real user problems</span>.
+      </h1>
+      <p class="hero-lead reveal delay-2">
+        I'm a UI/UX Designer passionate about creating intuitive, accessible, and user friendly digital experiences. I continue to grow my skills through practical projects and ongoing learning.
+      </p>
+      <div class="hero-ctas reveal delay-3">
+        <button class="btn btn-primary" data-page="projects">
+          View Work
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button class="btn btn-ghost" data-page="contact">Contact Me</button>
+      </div>
+      <div class="availability reveal delay-4">
+        <span class="dot"></span>
+        <span>Open to UI/UX Internships, Trainee Roles, and Junior Designer Opportunities</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ==================== PAGE: PROJECTS ==================== -->
+<section class="page" id="page-projects">
+  <div class="container">
+    <div class="section-label reveal">01 — Work</div>
+    <h2 class="section-title reveal delay-1">Selected work <br/>case studies in progress.</h2>
+    <p class="section-sub reveal delay-2">Each project here is a learning exercise. Click any project to explore the full case study.</p>
+    <div class="projects-filter reveal delay-3" style="margin-top: 48px;">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="ux">UX Research</button>
+      <button class="filter-btn" data-filter="ui">UI Design</button>
+      <button class="filter-btn" data-filter="mobile">Mobile</button>
+      <button class="filter-btn" data-filter="web">Web</button>
+    </div>
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: PROJECT DETAIL ==================== -->
+<section class="page" id="page-project-detail">
+  <div class="container">
+    <div class="case-study" id="case-study-container"></div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: ABOUT ==================== -->
+<section class="page" id="page-about">
+  <div class="container">
+    <div class="section-label reveal">02 — About</div>
+    <h2 class="section-title reveal delay-1">A designer in the making <br/>curious, grounded, and growing.</h2>
+    <div class="about-grid" style="margin-top: 64px;">
+      <div class="about-text reveal delay-2">
+        <p>My path into UI/UX Design hasn't been a straight line and I think that's what makes it honest. After completing my <strong>graduation and postgraduate studies</strong>, I spent time working in healthcare operations, where I learned the value of process, attention to detail, and clear communication.</p>
+        <p>Working closely with internal workflows and digital systems made me curious about <strong>why certain tools felt easy to use and others didn't</strong>. That curiosity led me to pursue a <strong>professional UI/UX Design certification</strong>, where I began learning user research, personas, empathy mapping, wireframing, prototyping, and usability testing.</p>
+        <p>Today, I'm focused on building a strong foundation in <strong>research driven design</strong>  learning to listen to users before designing for them. I'm not here to claim years of experience I don't have. I'm here to grow, contribute, and design with empathy and care.</p>
+      </div>
+      <div class="about-highlights reveal delay-3">
+        <div class="highlight-card"><div class="letter">A</div><h4>Academic Background</h4><p>Graduation and postgraduate studies completed.</p></div>
+        <div class="highlight-card"><div class="letter">C</div><h4>UX Certification</h4><p>Professional UI/UX Design certification completed.</p></div>
+        <div class="highlight-card"><div class="letter">R</div><h4>Research Driven</h4><p>Learning to let user insights guide design decisions.</p></div>
+        <div class="highlight-card"><div class="letter">L</div><h4>Always Learning</h4><p>Studying design systems, accessibility, and product thinking.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: EXPERIENCE ==================== -->
+<section class="page" id="page-experience">
+  <div class="container">
+    <div class="section-label reveal">03  Experience</div>
+    <h2 class="section-title reveal delay-1">Where I've been learning <br/>and what I've picked up.</h2>
+    <p class="section-sub reveal delay-2">A mix of structured UX training and real world operational work that shaped how I approach design problems.</p>
+    <div class="timeline" style="margin-top: 64px;">
+      <div class="timeline-item reveal">
+        <div class="timeline-head"><h3>UI/UX Design Training</h3><span class="timeline-meta">8 Months (April-Nov) · Dice Academy Delhi / Certificate in UI/UX Design</span></div>
+        <p class="timeline-desc">A structured learning journey covering the full product design process from understanding users to shipping testable prototypes.</p>
+        <div class="timeline-tags"><span>User Research</span><span>Personas</span><span>Empathy Mapping</span><span>Wireframing</span><span>Prototyping</span><span>Figma</span><span>Usability Testing</span><span>Accessibility</span><span>Design Systems</span></div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-head"><h3>Healthcare Operations</h3><span class="timeline-meta">August 2025 - Dec 2025 · PineHealthCare Pvt Ltd</span></div>
+        <p class="timeline-desc">Worked in healthcare verification and process-driven operations. Being exposed to internal workflows and digital systems is what first sparked my interest in UX and usability.</p>
+        <div class="timeline-tags"><span>Attention to Detail</span><span>Cross functional Communication</span><span>Documentation</span><span>Problem solving</span><span>Process Understanding</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: SKILLS ==================== -->
+<section class="page" id="page-skills">
+  <div class="container">
+    <div class="section-label reveal">04 Skills</div>
+    <h2 class="section-title reveal delay-1">Tools and methods I'm<br/>actively practicing.</h2>
+    <p class="section-sub reveal delay-2">I'm still growing in each of these  but these are the areas I'm investing my time in right now.</p>
+    <div class="skills-grid" style="margin-top: 64px;">
+      <div class="skill-group reveal" data-letter="U">
+        <h3><span class="num">01</span> UX Research</h3>
+        <ul class="skill-list"><li>User Interviews</li><li>Surveys</li><li>Empathy Mapping</li><li>User Personas</li><li>Journey Mapping</li><li>Information Architecture</li></ul>
+      </div>
+      <div class="skill-group reveal delay-1" data-letter="I">
+        <h3><span class="num">02</span> UI Design</h3>
+        <ul class="skill-list"><li>Wireframing</li><li>High Fidelity Design</li><li>Responsive Design</li><li>Accessibility</li><li>Prototyping</li><li>Design Thinking</li><li>Design Systems</li></ul>
+      </div>
+      <div class="skill-group reveal delay-2" data-letter="T">
+        <h3><span class="num">03</span> Tools</h3>
+        <ul class="skill-list"><li>Figma</li><li>FigJam</li><li>Framer</li><li>Adobe Illustrator</li><li>Adobe Photoshop</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: PROCESS ==================== -->
+<section class="page" id="page-process">
+  <div class="container">
+    <div class="section-label reveal">05 Process</div>
+    <h2 class="section-title reveal delay-1">How I approach<br/>a design problem.</h2>
+    <p class="section-sub reveal delay-2">A simple, repeatable framework I'm learning to follow and adapt as I grow.</p>
+    <div class="process-grid" style="margin-top: 64px;">
+      <div class="process-step reveal"><span class="step-num">01</span><h4>Research</h4><p>Understand the problem space, users, and context before designing anything.</p></div>
+      <div class="process-step reveal delay-1"><span class="step-num">02</span><h4>Define</h4><p>Synthesize insights into clear problem statements and design goals.</p></div>
+      <div class="process-step reveal delay-2"><span class="step-num">03</span><h4>Ideate</h4><p>Explore multiple directions without committing to one solution too early.</p></div>
+      <div class="process-step reveal"><span class="step-num">04</span><h4>Wireframe</h4><p>Sketch low fidelity structures to test flow and hierarchy quickly.</p></div>
+      <div class="process-step reveal delay-1"><span class="step-num">05</span><h4>Prototype</h4><p>Build interactive prototypes that feel close enough to test with real users.</p></div>
+      <div class="process-step reveal delay-2"><span class="step-num">06</span><h4>Test</h4><p>Validate assumptions through usability testing and honest feedback.</p></div>
+      <div class="process-step reveal delay-3"><span class="step-num">07</span><h4>Iterate</h4><p>Refine based on what I learn design is never truly "done."</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PAGE: CONTACT ==================== -->
+<section class="page" id="page-contact">
+  <div class="container">
+    <div class="section-label reveal">06 Contact</div>
+    <h2 class="section-title reveal delay-1">Let's connect <br/>I'd love to hear from you.</h2>
+    <p class="section-sub reveal delay-2">Open to internships, trainee roles, and junior designer opportunities.</p>
+    <div class="contact-grid" style="margin-top: 64px;">
+      <div class="contact-info reveal delay-3">
+        <a href="mailto:rahuldhariwal2027@gmail.com" class="contact-item">
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><div class="label">Email</div><div class="value">rahuldhariwal2027@gmail.com</div></div>
+        </a>
+        <a href="https://www.linkedin.com/in/rahuldhariwal3" class="contact-item">
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></div>
+          <div><div class="label">LinkedIn</div><div class="value">linkedin.com/in/rahuldhariwal3</div></div>
+        </a>
+        <a href="https://behance.net/rahuldhariwal3" class="contact-item">
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5l-17 8 6 2 2 6 9-16zm-3.2 2.3L8.8 13.7l-3.6-1.2 12.1-6.7z"/></svg></div>
+          <div><div class="label">Behance</div><div class="value">behance.net/rahuldhariwal3</div></div>
+        </a>
+        <div class="contact-item">
+          <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="label">Location</div><div class="value">Noida, India</div></div>
+        </div>
+      </div>
+      <form
+  class="contact-form reveal delay-4"
+  id="contactForm"
+  name="contact"
+  method="POST"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+>
+
+  <!-- Netlify hidden fields -->
+  <input type="hidden" name="form-name" value="contact">
+
+  <p hidden>
+    <label>
+      Don't fill this out:
+      <input name="bot-field">
+    </label>
+  </p>
+
+  <div class="form-row">
+    <div class="form-field">
+      <label for="name">Name</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Your name"
+        required
+      >
+    </div>
+
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        required
+      >
+    </div>
+  </div>
+
+  <div class="form-field">
+    <label for="subject">Subject</label>
+    <input
+      type="text"
+      id="subject"
+      name="subject"
+      placeholder="What's this about?"
+    >
+  </div>
+
+  <div class="form-field">
+    <label for="message">Message</label>
+    <textarea
+      id="message"
+      name="message"
+      placeholder="Tell me about your opportunity or project..."
+      required
+    ></textarea>
+  </div>
+
+  <button
+    type="submit"
+    class="btn btn-primary"
+    style="width:100%; justify-content:center;"
+  >
+    Send Message
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  </button>
+
+</form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-copy">© <span id="year"></span> Rahul Dhariwal. All rights reserved. Designed & built with ♥</div>
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com/in/rahuldhariwal3" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      <a href="https://behance.net/rahuldhariwal3" aria-label="Behance"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5l-17 8 6 2 2 6 9-16zm-3.2 2.3L8.8 13.7l-3.6-1.2 12.1-6.7z"/></svg></a>
+      <a href="#" aria-label="Dribbble"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72M21.54 15.5c-6.37-1.37-10.42-1.37-17.54 0M6 4.5c4 5 6 9 8 17"/></svg></a>
+      <a href="mailto:rahuldhariwal2027@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   🚀 HOW TO ADD / REMOVE PROJECTS & IMAGES
+   =========================================================
+   1. ADD A NEW PROJECT: Copy a project block, paste at bottom.
+   2. ADD A NEW SECTION: Copy a section block inside 'sections'.
+   3. ADD IMAGES: Paste image URL inside the 'images' array.
+      Use "PASTE_YOUR_IMAGE_URL_HERE" placeholder or leave empty.
+   4. REMOVE A SECTION: Delete that block from 'sections' array.
+   ========================================================= */
+
+const projects = [
+  {
+    num: "01",
+    category: "Mobile App • UX Research • UI Design",
+    title: "Laundry Mitra",
+    brief: "Simplifying the laundry service experience with a transparent, user-friendly mobile platform.",
+    tags: ["ux", "mobile", "ui"],
+    intro: "Laundry Mitra is a mobile application that allows users to schedule laundry pickup, track orders, and make secure payments through a simple and user friendly interface.",
+    coverImage: "images/lm-cover.jpg",
+    sections: [
+  { 
+    type: "overview",
+    role: "UI/UX Designer",
+    duration: "3 Weeks",
+    tools: "Figma, FigJam, Adobe Photoshop, Adobe Illustrator",
+    platform: "Mobile"
+  },
+
+  {
+    type: "problem",
+    title: "Making laundry services more convenient, transparent, and accessible.",
+    description: "Many traditional laundry services rely on phone calls, walk in visits, or manual communication, making the overall experience slow and inconvenient. Customers often struggle to schedule pickups, know service pricing, track order status, or receive timely updates. The goal of Laundry Mitra was to create a digital platform that simplifies the entire laundry journey from booking a service to doorstep delivery while improving transparency, convenience, and user confidence."
+  },
+
+  {
+    type: "content",
+    label: "Research",
+    title: "Understanding users and context",
+    description: "The project began with understanding the existing laundry service experience through secondary research and competitor analysis. Similar laundry applications and online service platforms were reviewed to identify common features and usability patterns. The research highlighted several recurring user needs: quick booking, transparent pricing, real-time order tracking, flexible pickup scheduling, and a simple checkout process.",
+    images: ["images/lm-research.jpg"],
+    tags: ["User Interviews", "Surveys", "Competitive Analysis"]
+  },
+
+  {
+    type: "content",
+    label: "Define",
+    title: "Framing the right problem",
+    description: "Research findings were organized into user requirements and a structured information architecture. The primary problem statement became: 'How might we make laundry services easier to access while reducing the effort required to book, track, and manage orders?'",
+    images: ["images/lm-persona.jpg"]
+  },
+
+  {
+    type: "content",
+    label: "Ideate & Wireframe",
+    title: "Exploring solutions",
+    description: "Several user flows and low-fidelity wireframes were created to explore different approaches for onboarding, service selection, pickup scheduling, order tracking, and payment.",
+    images: ["images/lm-userflow.jpg", "images/lm-wireframe.jpg"]
+  },
+
+  {
+    type: "content",
+    label: "Visual Design",
+    title: "Bringing it to life",
+    description: "The final interface follows a clean, modern visual style using a blue-and-white color palette that communicates trust and cleanliness. High-fidelity screens were created for onboarding, authentication, home, service selection, booking, order tracking, payment, notifications, profile management.",
+    images: ["images/lm-hifi.jpg"]
+  },
+
+  // {
+  //   type: "content",
+  //   label: "Testing & Iteration",
+  //   title: "Validating with real users",
+  //   description: "The interactive prototype was reviewed to evaluate navigation flow, screen consistency, and overall usability. Based on feedback and self-evaluation, improvements were made to button placement, content hierarchy, and screen transitions.",
+  //   images: ["lm-wireframe.jpg"]
+  // },
+
+  {
+    type: "outcome",
+    title: "What I learned",
+    description: "The project resulted in a complete end to end mobile application prototype covering the full laundry service experience from account creation to order delivery.",
+    tags: [
+      "UX Research",
+      "Competitor Analysis",
+      "Information Architecture",
+      "User Flow Design",
+      "Wireframing",
+      "Prototyping",
+      "Mobile UI Design",
+      "Design Systems"
+    ]
+  }
+]
+  },
+  {
+    num: "02",
+    category: "Mobile App • UX Research • UI Design",
+    title: "Tiagotrip",
+    brief: "A travel booking app",
+    tags: ["ui", "mobile"],
+    intro: "TaigoTrip is a mobile travel app concept that helps users discover destinations, plan trips, and manage bookings through a simple and intuitive interface.",
+    coverImage: "images/tg-cover.jpg",
+   sections: [
+  {
+    type: "overview",
+    role: "UI/UX Designer",
+    duration: "3 Weeks",
+    tools: "Figma, FigJam, Adobe Photoshop",
+    platform: "Mobile"
+  },
+
+  {
+    type: "problem",
+    title: "Designing a modern travel planning experience.",
+    description: "TaigoTrip is a mobile travel app concept that helps users discover destinations, plan trips, and manage bookings through a simple and intuitive interface."
+  },
+
+  {
+    type: "content",
+    label: "Research",
+    title: "Research & Strategy",
+    description: "Conducted user research, competitor analysis, and defined user needs before designing the experience.",
+    images: ["images/tg-research.jpg"]
+  },
+
+  {
+    type: "content",
+    label: "User Flow",
+    title: "User Journey",
+    description: "Created user flows and information architecture to simplify navigation and booking.",
+    images: ["images/tg-userflow.jpg"]
+  },
+
+  // {
+  //   type: "content",
+  //   label: "Wireframes",
+  //   title: "Wireframing",
+  //   description: "Designed low and mid-fidelity wireframes to validate layouts and interactions.",
+  //   images: ["images/tg-wireframe.jpg"]
+  // },
+
+  {
+    type: "content",
+    label: "Final UI",
+    title: "High Fidelity Design",
+    description: "Designed the final interface with a clean visual system, modern typography, and intuitive interactions.",
+    images: ["images/tg-hifi.jpg"]
+  },
+
+  {
+    type: "outcome",
+    title: "Outcome",
+    description: "A complete mobile travel app prototype showcasing the end-to-end user experience.",
+    tags: [
+      "UX Research",
+      "User Flow",
+      "Wireframing",
+      "UI Design",
+      "Prototyping"
+    ]
+  }
+]
+  },
+  {
+    num: "03",
+    category: "ui",
+    title: "Creating a modern ticket booking experience.",
+    brief: "This concept focuses on designing a visually engaging and intuitive ticket booking interface with smooth user interactions, clean layouts, and a premium mobile experience",
+    tags: ["ui", "mobile"],
+    intro: "A Ticket Booking UI shows the intraction of screens",
+    coverImage: "images/ticket-cover.jpg",
+    sections: [
+  {
+    type: "overview",
+    role: "UI Designer",
+    duration: "1 Week",
+    tools: "Figma",
+    platform: "Mobile"
+  },
+
+  {
+    type: "problem",
+    title: "Creating a modern ticket booking experience.",
+    description: "This concept focuses on designing a visually engaging and intuitive ticket booking interface with smooth user interactions, clean layouts, and a premium mobile experience."
+  },
+
+  // {
+  //   type: "content",
+  //   label: "UI Design",
+  //   title: "High-Fidelity Screens",
+  //   description: "Designed a complete ticket booking interface featuring event discovery, seat selection, booking flow, payment, and confirmation screens.",
+  //   images: ["tb-ui.jpg"]
+  // },
+
+  {
+    type: "content",
+    label: "Prototype",
+    title: "Interactive Prototype",
+    description: "Built an interactive prototype showcasing smooth transitions, micro-interactions, and the complete booking journey.",
+    embed: "PASTE_YOUR_FIGMA_OR_YOUTUBE_EMBED_LINK_HERE"
+  },
+
+  {
+    type: "outcome",
+    title: "Outcome",
+    description: "A polished UI concept demonstrating modern mobile interface design, interaction design, and prototyping skills.",
+    tags: [
+      "Mobile UI",
+      "Interaction Design",
+      "Prototyping",
+      "Micro-interactions",
+      "Figma"
+    ]
+  }
+]
+  }
+];
+
+/* =========================
+   HELPER FUNCTIONS
+   ========================= */
+function safeImg(src) {
+  if (!src || src.includes("PASTE_") || src.trim() === "") return null;
+  return encodeURI(src);
+}
+
+/* =========================
+   DYNAMIC RENDERERS
+   ========================= */
+function renderProjectsGrid() {
+  const grid = document.getElementById('projects-grid');
+  let html = '';
+  projects.forEach((project, index) => {
+    const delayClass = index === 0 ? '' : `delay-${Math.min(index, 3)}`;
+    const categories = project.tags ? project.tags.join(' ') : '';
+    const safeCover = safeImg(project.coverImage);
+    const coverHTML = safeCover
+      ? `<img src="${safeCover}" alt="${project.title} Cover">`
+      : `<span class="big-letter">${project.num}</span>`;
+    html += `
+      <article class="project-card reveal ${delayClass}" data-category="${categories}" data-project-index="${index}">
+        <div class="project-cover">${coverHTML}</div>
+        <div class="project-body">
+          <div class="project-category">${project.category}</div>
+          <h3>${project.title}</h3>
+          <p class="project-brief">${project.brief}</p>
+          <div class="project-link">View Case Study <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        </div>
+      </article>
+    `;
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const index = parseInt(card.dataset.projectIndex);
+      openProject(index);
+    });
+  });
+  observeReveals(grid);
+  attachCursorListeners();
+}
+
+function renderCaseStudy(project) {
+  const container = document.getElementById('case-study-container');
+  let html = '';
+  html += `
+    <div class="case-back" id="caseBack">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Work
+    </div>
+    <div class="case-hero reveal">
+      <div class="case-category">${project.category}</div>
+      <h1>${project.title}</h1>
+      <p class="case-intro">${project.intro}</p>
+    </div>
+  `;
+  const safeCover = safeImg(project.coverImage);
+  if (safeCover) {
+    html += `<div class="case-cover-img reveal delay-1"><img src="${safeCover}" alt="${project.title} Cover"></div>`;
+  } else {
+    html += `<div class="case-cover-img reveal delay-1"><span class="big-num">${project.num}</span></div>`;
+  }
+  project.sections.forEach((section, index) => {
+    const delayClass = index % 3 === 0 ? '' : `delay-${index % 3}`;
+    if (section.type === 'overview') {
+      html += `
+        <div class="case-section reveal ${delayClass}">
+          <div class="case-section-label">Overview</div>
+          <h3>Project at a glance</h3>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+            <div><p style="font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">Role</p><p style="color:var(--text); font-weight:500;">${section.role}</p></div>
+            <div><p style="font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">Duration</p><p style="color:var(--text); font-weight:500;">${section.duration}</p></div>
+            <div><p style="font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">Tools</p><p style="color:var(--text); font-weight:500;">${section.tools}</p></div>
+            <div><p style="font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">Platform</p><p style="color:var(--text); font-weight:500;">${section.platform}</p></div>
+          </div>
+        </div>
+        <div class="case-divider"></div>
+      `;
+    } else if (section.type === 'problem') {
+      html += `
+        <div class="case-section reveal ${delayClass}">
+          <div class="case-section-label">The Problem</div>
+          <h3>${section.title}</h3>
+          <p>${section.description}</p>
+        </div>
+        <div class="case-divider"></div>
+      `;
+    } else if (section.type === 'outcome') {
+      html += `
+        <div class="case-section reveal ${delayClass}">
+          <div class="case-section-label">Outcome & Learnings</div>
+          <h3>${section.title}</h3>
+          <p>${section.description}</p>
+          ${section.tags ? `<div class="case-tags">${section.tags.map(t => `<span>${t}</span>`).join('')}</div>` : ''}
+        </div>
+      `;
+    } else if (section.type === 'content') {
+      let imagesHTML = '';
+      if (section.images && section.images.length > 0) {
+        imagesHTML = '<div class="case-img-container">';
+        section.images.forEach(img => {
+          const safeSrc = safeImg(img);
+          if (safeSrc) {
+            imagesHTML += `<img src="${safeSrc}" alt="Project Image" loading="lazy">`;
+          } else {
+            imagesHTML += `<div class="case-img-placeholder"><span>Image Placeholder</span></div>`;
+          }
+        });
+        imagesHTML += '</div>';
+      }
+      html += `
+        <div class="case-section reveal ${delayClass}">
+          <div class="case-section-label">${section.label}</div>
+          <h3>${section.title}</h3>
+          <p>${section.description}</p>
+          ${imagesHTML}
+          ${section.tags ? `<div class="case-tags">${section.tags.map(t => `<span>${t}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="case-divider"></div>
+      `;
+    }
+  });
+  const currentIndex = projects.findIndex(p => p.title === project.title);
+  const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : null;
+  const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : null;
+  html += `
+    <div class="case-nav reveal">
+      <div class="case-nav-item prev" id="casePrev" style="visibility:${prevProject ? 'visible' : 'hidden'};">
+        <span class="dir">← Previous</span>
+        <span class="title">${prevProject ? prevProject.title : ''}</span>
+      </div>
+      <div class="case-nav-item next" id="caseNext" style="visibility:${nextProject ? 'visible' : 'hidden'};">
+        <span class="dir">Next →</span>
+        <span class="title">${nextProject ? nextProject.title : ''}</span>
+      </div>
+    </div>
+  `;
+  container.innerHTML = html;
+  const backBtn = document.getElementById('caseBack');
+  if (backBtn) backBtn.addEventListener('click', () => navigateTo('projects'));
+  const prevBtn = document.getElementById('casePrev');
+  const nextBtn = document.getElementById('caseNext');
+  if (prevBtn && prevProject) prevBtn.onclick = () => openProject(currentIndex - 1);
+  if (nextBtn && nextProject) nextBtn.onclick = () => openProject(currentIndex + 1);
+  setTimeout(() => {
+    observeReveals(container);
+    attachCursorListeners();
+  }, 50);
+}
+
+/* =========================
+   THEME TOGGLE
+   ========================= */
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+root.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
+themeToggle.addEventListener('click', () => {
+  const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+});
+
+/* =========================
+   PAGE NAVIGATION (FIXED FAST LOAD)
+   ========================= */
+const pages = document.querySelectorAll('.page');
+const navLinks = document.querySelectorAll('.nav-link');
+const pageTransition = document.getElementById('pageTransition');
+const menuBtn = document.getElementById('menuBtn');
+const navLinksContainer = document.getElementById('navLinks');
+let currentPage = 'home';
+let isTransitioning = false;
+
+function navigateTo(pageId) {
+  if ((pageId === currentPage && pageId !== 'project-detail') || isTransitioning) return;
+  isTransitioning = true;
+  pageTransition.classList.add('active');
+  setTimeout(() => {
+    pages.forEach(p => {
+      p.classList.remove('active');
+      p.classList.remove('page-entering');
+    });
+    const target = document.getElementById('page-' + pageId);
+    if (target) {
+      target.classList.add('active');
+      target.classList.add('page-entering'); // Only animate on transition
+      target.querySelectorAll('.reveal').forEach(el => { el.classList.remove('visible'); void el.offsetWidth; });
+      setTimeout(() => observeReveals(target), 50);
+    }
+    const navMap = { 'project-detail': 'projects' };
+    const activeId = navMap[pageId] || pageId;
+    navLinks.forEach(link => link.classList.toggle('active', link.dataset.page === activeId));
+    currentPage = pageId;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    menuBtn.classList.remove('open');
+    navLinksContainer.classList.remove('open');
+    setTimeout(() => {
+      pageTransition.classList.remove('active');
+      isTransitioning = false;
+    }, 150);
+  }, 400);
+}
+
+document.querySelectorAll('[data-page]').forEach(el => {
+  el.addEventListener('click', (e) => { e.preventDefault(); navigateTo(el.dataset.page); });
+});
+
+/* =========================
+   OPEN PROJECT DETAIL
+   ========================= */
+function openProject(projectIndex) {
+  const project = projects[projectIndex];
+  if (!project) return;
+  renderCaseStudy(project);
+  navigateTo('project-detail');
+}
+
+/* =========================
+   MOBILE MENU
+   ========================= */
+menuBtn.addEventListener('click', () => {
+  menuBtn.classList.toggle('open');
+  navLinksContainer.classList.toggle('open');
+});
+
+/* =========================
+   STICKY NAV
+   ========================= */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+/* =========================
+   SCROLL REVEAL
+   ========================= */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+function observeReveals(container = document) {
+  container.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObserver.observe(el));
+}
+
+/* =========================
+   PROJECT FILTER
+   ========================= */
+const filterBtns = document.querySelectorAll('.filter-btn');
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('filter-btn')) {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    const filter = e.target.dataset.filter;
+    document.querySelectorAll('.project-card').forEach(card => {
+      const show = filter === 'all' || (card.dataset.category || '').includes(filter);
+      card.style.display = show ? '' : 'none';
+      if (show) { card.style.animation = 'none'; void card.offsetWidth; card.style.animation = 'fadeIn 0.4s var(--ease)'; }
+    });
+  }
+});
+
+/* =========================
+   CONTACT FORM (NETLIFY)
+   ========================= */
+
+document.getElementById("contactForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const form = this;
+  const btn = form.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+
+  btn.innerHTML = "Sending...";
+  btn.style.pointerEvents = "none";
+
+  try {
+    const formData = new FormData(form);
+
+    await fetch("/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams(formData).toString()
+    });
+
+    btn.innerHTML = "Message Sent ✓";
+    form.reset();
+
+  } catch (error) {
+    btn.innerHTML = "Failed to Send ✕";
+  }
+
+  setTimeout(() => {
+    btn.innerHTML = originalText;
+    btn.style.pointerEvents = "";
+  }, 2500);
+});
+
+/* =========================
+   FOOTER YEAR
+   ========================= */
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const s = document.createElement('style');
+s.textContent = `@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }`;
+document.head.appendChild(s);
+
+/* =========================
+   🎯 INTERACTIVE CUSTOM CURSOR
+   ========================= */
+const cursorDot = document.getElementById('cursorDot');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
+let isHovering = false;
+
+function isCursorDevice() {
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth > 900;
+}
+
+function initCursor() {
+  if (!isCursorDevice()) return;
+  document.body.classList.add('custom-cursor-active');
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    // Dot follows instantly
+    cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+  });
+
+  // Smooth ring animation loop
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Click animation
+  document.addEventListener('mousedown', () => cursorRing.classList.add('click'));
+  document.addEventListener('mouseup', () => cursorRing.classList.remove('click'));
+
+  // Hide cursor when leaving window
+  document.addEventListener('mouseleave', () => {
+    cursorDot.style.opacity = '0';
+    cursorRing.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    cursorDot.style.opacity = '1';
+    cursorRing.style.opacity = '1';
+  });
+
+  attachCursorListeners();
+}
+
+function attachCursorListeners() {
+  if (!isCursorDevice()) return;
+  const hoverables = document.querySelectorAll(
+    'a, button, .project-card, .skill-group, .timeline-item, .highlight-card, .process-step, .contact-item, .nav-link, .logo, .filter-btn, input, textarea, .case-nav-item, .case-back'
+  );
+  hoverables.forEach(el => {
+    // Remove old listeners by cloning (prevents duplicates on re-render)
+    el.addEventListener('mouseenter', handleCursorEnter);
+    el.addEventListener('mouseleave', handleCursorLeave);
+  });
+}
+
+function handleCursorEnter() {
+  cursorRing.classList.add('hover');
+  cursorDot.classList.add('hover');
+}
+function handleCursorLeave() {
+  cursorRing.classList.remove('hover');
+  cursorDot.classList.remove('hover');
+}
+
+/* =========================
+   INITIALIZE ON LOAD (NO DELAY)
+   ========================= */
+document.addEventListener('DOMContentLoaded', () => {
+  // Home page reveals trigger immediately — no blank screen
+  observeReveals();
+  renderProjectsGrid();
+  initCursor();
+});
+
+// Fallback: if DOMContentLoaded already fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(() => {
+    observeReveals();
+    if (!document.getElementById('projects-grid').innerHTML) renderProjectsGrid();
+    initCursor();
+  }, 10);
+}
+</script>
+</body>
+</html>
