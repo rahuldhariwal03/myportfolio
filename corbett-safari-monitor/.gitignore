@@ -22,7 +22,7 @@ data/exports/*
 !data/exports/.gitkeep
 data/inspection/*
 !data/inspection/.gitkeep
-data/browser_profile/
+data/browser_profile*/
 data/.collector.lock
 
 # Local verified selector overrides (keep selectors.example.json in git)

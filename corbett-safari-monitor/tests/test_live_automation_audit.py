@@ -93,14 +93,19 @@ def test_read_only_guard_allows_booking_domain_availability_reads_but_blocks_mut
     assert ReadOnlyGuard.should_block_network_request(
         "https://safari.corbettgov.org/api/book-ticket", "POST"
     ) is True
+    # Passive checkout.js script load is allowed so SPA doesn't freeze on 'Loading...',
+    # while actual Razorpay checkout navigation and order POSTs are ALWAYS blocked!
     assert ReadOnlyGuard.should_block_network_request(
-        "https://booking.corbettgov.org/api/orders/create", "POST"
-    ) is True
-    assert ReadOnlyGuard.should_block_network_request(
-        "https://safari.corbettgov.org/api/send-otp", "POST"
-    ) is True
+        "https://checkout.razorpay.com/v1/checkout.js", "GET", "script"
+    ) is False
     assert ReadOnlyGuard.should_block_network_request(
         "https://api.razorpay.com/v1/checkout", "GET"
+    ) is True
+    assert ReadOnlyGuard.should_block_network_request(
+        "https://api.razorpay.com/v1/orders", "POST"
+    ) is True
+    assert ReadOnlyGuard.should_block_network_request(
+        "https://booking.corbettgov.org/api/create-order", "POST"
     ) is True
     assert ReadOnlyGuard.should_block_network_request(
         "https://safari.corbettgov.org/api/cart/add", "POST"

@@ -1202,10 +1202,66 @@ def render_collection_monitoring_page(
             )
         elif not selectors_ready:
             st.info(
-                "**One-Time Calibration Needed:** Run `2_calibrate_live_portal.bat` (or "
-                "`python scripts/inspect_portal.py --interactive`) once so your browser saves "
-                "your genuine location permission and confirms the exact portal selectors."
+                "**One-Time Setup (No Commands Needed!):** Click **Step 1** below to open "
+                "`safari.corbettgov.org` in your real Chrome/Edge. Accept the declaration, click "
+                "**Allow** on location, select **1 open safari date** so slots appear, then come "
+                "back here and click **Step 2: Capture Page Now**."
             )
+            cal_c1, cal_c2, cal_c3 = st.columns([1.2, 1.2, 1.1])
+            inspect_script = Path(__file__).resolve().parents[2] / "scripts" / "inspect_portal.py"
+            state_file = config.inspection_dir / "calibration_state.json"
+            signal_file = config.inspection_dir / "capture_now.signal"
+            latest_report = config.inspection_dir / "inspection_latest.json"
+
+            with cal_c1:
+                if st.button(
+                    "Step 1: Open Corbett Portal (Stays Open)",
+                    type="primary",
+                    width="stretch",
+                    key="btn_open_cal",
+                ):
+                    signal_file.unlink(missing_ok=True)
+                    subprocess.Popen(
+                        [sys.executable, str(inspect_script), "--wait-for-signal"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                    )
+                    st.success(
+                        "Opening Chrome/Edge now! Accept consent, Allow location, pick 1 open "
+                        "date, then click **Step 2**."
+                    )
+            with cal_c2:
+                if st.button(
+                    "Step 2: Capture Page Now",
+                    width="stretch",
+                    key="btn_capture_cal",
+                ):
+                    config.inspection_dir.mkdir(parents=True, exist_ok=True)
+                    signal_file.write_text("capture", encoding="utf-8")
+                    import time as _t
+
+                    for _ in range(16):
+                        _t.sleep(0.5)
+                        if not signal_file.exists():
+                            break
+                    _t.sleep(1.5)
+                    st.success("Captured! Open **Setup Checklist & Selector Approval** tab (or download report).")
+            with cal_c3:
+                if latest_report.exists():
+                    st.download_button(
+                        label="Download inspection_latest.json",
+                        data=latest_report.read_bytes(),
+                        file_name="inspection_latest.json",
+                        mime="application/json",
+                        width="stretch",
+                    )
+
+            if state_file.exists():
+                try:
+                    st_data = json.loads(state_file.read_text(encoding="utf-8"))
+                    st.caption(f"Setup status (`{st_data.get('status')}`): {st_data.get('detail')}")
+                except Exception:  # noqa: BLE001
+                    pass
 
         adm_left, adm_right = st.columns([1.35, 1.65])
         with adm_left:

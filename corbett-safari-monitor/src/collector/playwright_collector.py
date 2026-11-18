@@ -178,6 +178,56 @@ class BrowserDriver(Protocol):
     def close(self) -> None: ...
 
 
+def launch_persistent_browser(
+    playwright_obj: Any,
+    base_profile_dir: Path,
+    *,
+    headless: bool,
+    timezone_name: str,
+) -> tuple[Any, str]:
+    """Launch a persistent browser context preferring real Chrome/Edge on Windows/Mac.
+
+    Playwright's standalone Chromium binary lacks OS/Google Wi-Fi geolocation API keys
+    on desktop PCs without GPS hardware, causing sites with browser Location Verification
+    (like `safari.corbettgov.org`) to hang on `Loading...`. Using installed Chrome or
+    Edge uses genuine OS Location Services while keeping an isolated app profile folder.
+    """
+    preferred = os.getenv("PLAYWRIGHT_BROWSER_CHANNEL", "auto").strip().lower()
+    if preferred in {"chrome", "msedge"}:
+        candidates: list[str | None] = [preferred, None]
+    elif preferred == "chromium":
+        candidates = [None]
+    else:
+        candidates = ["chrome", "msedge", None]
+
+    last_err: Exception | None = None
+    for channel in candidates:
+        suffix = f"_{channel}" if channel else ""
+        target_dir = base_profile_dir.parent / f"{base_profile_dir.name}{suffix}"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        kwargs: dict[str, Any] = {
+            "user_data_dir": str(target_dir),
+            "headless": headless,
+            "locale": "en-IN",
+            "timezone_id": timezone_name,
+        }
+        if channel:
+            kwargs["channel"] = channel
+        try:
+            ctx = playwright_obj.chromium.launch_persistent_context(**kwargs)
+            return ctx, (channel or "chromium")
+        except Exception as exc:  # noqa: BLE001
+            last_err = exc
+            msg = str(exc)
+            # If this profile is already open in another window, report immediately
+            if "ProcessSingleton" in msg or "user data directory is already in use" in msg:
+                raise
+            continue
+
+    assert last_err is not None
+    raise last_err
+
+
 class PlaywrightBrowserDriver:
     """Real Playwright Chromium session with read-only network and action guards.
 
@@ -216,13 +266,13 @@ class PlaywrightBrowserDriver:
         self._playwright = self._pw_context_manager.start()
 
         if self.config.playwright_user_data_dir is not None:
-            self.config.playwright_user_data_dir.mkdir(parents=True, exist_ok=True)
-            self._context = self._playwright.chromium.launch_persistent_context(
-                user_data_dir=str(self.config.playwright_user_data_dir),
+            self._context, channel_used = launch_persistent_browser(
+                self._playwright,
+                self.config.playwright_user_data_dir,
                 headless=self.config.playwright_headless,
-                locale="en-IN",
-                timezone_id=self.config.timezone_name,
+                timezone_name=self.config.timezone_name,
             )
+            logger.info("Launched persistent browser channel: %s", channel_used)
             self._page = (
                 self._context.pages[0] if self._context.pages else self._context.new_page()
             )
@@ -238,13 +288,15 @@ class PlaywrightBrowserDriver:
 
         self._page.set_default_timeout(self.config.playwright_timeout_ms)
 
-        # Network-level read-only safety fence (aborts any booking/cart/OTP/payment mutation)
+        # Network-level read-only safety fence (aborts only real booking/cart/OTP/payment writes)
         def _guard_route(route: Any, request: Any) -> None:
-            if ReadOnlyGuard.should_block_network_request(request.url, request.method):
+            res_type = getattr(request, "resource_type", None)
+            if ReadOnlyGuard.should_block_network_request(request.url, request.method, res_type):
                 logger.warning(
-                    "ReadOnlyGuard aborted mutating/booking request: %s %s",
+                    "ReadOnlyGuard aborted mutating/booking request: %s %s (%s)",
                     request.method,
                     request.url,
+                    res_type,
                 )
                 route.abort()
             else:

@@ -59,52 +59,31 @@ FORBIDDEN_URL_SEGMENTS: tuple[str, ...] = (
 # (e.g. clicking the browser's genuine 'Allow' location prompt) without any bypass.
 HUMAN_RESOLVABLE_GATE_TYPES: frozenset[str] = frozenset({"location_verification_required"})
 
-# Strictly read-only path keywords that must NOT be misclassified as booking mutations
-_READ_ONLY_PATH_HINTS: tuple[str, ...] = (
-    "availability",
-    "available",
-    "calendar",
-    "schedule",
-    "slots",
-    "zones",
-    "events",
-    "status",
-    "config",
+# Explicit mutating endpoints blocked on POST / PUT / PATCH / DELETE so the collector
+# can NEVER create an order, add to cart, hold a permit, send an OTP, submit passenger
+# data, or initiate payment — while NEVER aborting GET scripts/styles/assets or initial
+# read-only SPA boot requests (which previously caused safari.corbettgov.org to stick on
+# "Loading..." when <script src="https://checkout.razorpay.com/..."> was aborted).
+_MUTATING_BOOKING_PATH_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(r"/(?:create|place|confirm|submit|complete)[-_]?(?:order|booking|payment|ticket)", re.IGNORECASE),
+    re.compile(r"/(?:orders?|bookings?)/(?:create|place|confirm|submit)", re.IGNORECASE),
+    re.compile(r"/book(?:/|$)", re.IGNORECASE),
+    re.compile(r"/book[-_]?ticket", re.IGNORECASE),
+    re.compile(r"/(?:add[-_]?to[-_]?cart|cart/(?:add|create|update|checkout))", re.IGNORECASE),
+    re.compile(r"/(?:checkout|payment|verify[-_]?payment|pay[-_]?now)(?:/|$)", re.IGNORECASE),
+    re.compile(r"/(?:reserve|hold[-_]?(?:seat|permit|slot|ticket))(?:/|$)", re.IGNORECASE),
+    re.compile(r"/(?:send[-_]?otp|verify[-_]?otp|otp/(?:send|verify))(?:/|$)", re.IGNORECASE),
+    re.compile(r"/(?:passenger|visitor[-_]?details)(?:/(?:add|save|create|submit)|$)", re.IGNORECASE),
 )
 
-# Mutating booking/payment path segments blocked unconditionally across ALL HTTP methods
-_ALWAYS_BLOCKED_PATH_SEGMENTS: tuple[str, ...] = (
-    "/payment",
-    "/checkout",
-    "/pay",
-    "/otp",
-    "/send-otp",
-    "/verify-otp",
-    "/cart",
-    "/book-ticket",
-    "/create-booking",
-    "/confirm-booking",
-    "/create-order",
-    "/reserve",
-    "/hold-seat",
-    "/hold-permit",
-    "/passenger",
-    "/visitor-details",
-)
-
-# Mutating booking/payment keywords blocked on POST / PUT / PATCH / DELETE path+query
-_WRITE_BLOCKED_KEYWORDS: tuple[str, ...] = (
-    "book",
-    "order",
-    "pay",
-    "cart",
-    "reserve",
-    "hold",
-    "otp",
-    "passenger",
-    "visitor",
-    "checkout",
-    "permit",
+_PAYMENT_GATEWAY_HOSTS: tuple[str, ...] = (
+    "razorpay.com",
+    "payu.in",
+    "payumoney.com",
+    "cashfree.com",
+    "ccavenue.com",
+    "billdesk.com",
+    "paytm.com",
 )
 # Note from Phase 1 inspection: safari.corbettgov.org ships hidden modal markup in
 # initial HTML, so callers MUST strip hidden DOM nodes before matching.
@@ -331,52 +310,53 @@ class ReadOnlyGuard:
                 )
 
     @staticmethod
-    def should_block_network_request(url: str, method: str) -> bool:
-        """Return True if a browser request attempts a booking/cart/payment mutation.
+    def should_block_network_request(
+        url: str,
+        method: str,
+        resource_type: str | None = None,
+    ) -> bool:
+        """Return True ONLY when a request attempts a real booking/cart/OTP/payment mutation.
 
-        Checks the URL path/query rather than the official domain (`booking.corbettgov.org`)
-        so legitimate read-only availability fetches are never aborted by mistake.
+        IMPORTANT: Never aborts static page resources (`script`, `stylesheet`, `image`,
+        `font`) or passive `GET`/`HEAD`/`OPTIONS` loads — `safari.corbettgov.org` includes
+        third-party checkout scripts and initial state fetches in its boot bundle and stays
+        stuck on `Loading...` if passive page assets are aborted. Top-level navigation to
+        checkout/payment routes is still blocked across all methods.
         """
         upper_method = (method or "GET").upper()
+        res_type = (resource_type or "").lower()
         parsed = urlparse(url or "")
         host = (parsed.hostname or "").lower()
         path = (parsed.path or "").lower()
-        path_and_query = f"{path}?{parsed.query}".lower() if parsed.query else path
 
-        # Block third-party payment gateways completely
-        if any(gw in host for gw in ("razorpay", "payu", "cashfree", "ccavenue", "billdesk", "paytm")):
-            return True
+        # Never abort passive static subresources (JS bundles, CSS, fonts, images)
+        if res_type in {"script", "stylesheet", "image", "font", "media", "manifest"}:
+            return False
 
-        # Block explicit booking/cart/checkout/OTP/payment paths regardless of HTTP verb
-        for seg in _ALWAYS_BLOCKED_PATH_SEGMENTS:
-            if path == seg or path.startswith(f"{seg}/") or f"{seg}/" in path or path.endswith(seg):
+        is_payment_host = any(host == gw or host.endswith(f".{gw}") for gw in _PAYMENT_GATEWAY_HOSTS)
+
+        # Block any top-level page navigation or payment API mutation to payment gateways
+        if is_payment_host:
+            if upper_method in {"POST", "PUT", "PATCH", "DELETE"}:
                 return True
+            if any(seg in path for seg in ("/checkout", "/orders", "/payments", "/pay")):
+                # Allow passive checkout.js script even when resource_type wasn't passed
+                if path.endswith(".js") or path.endswith(".css"):
+                    return False
+                return True
+            return False
 
-        # Block mutating POST/PUT/PATCH/DELETE calls targeting booking/order/passenger endpoints,
-        # while allowing read-only availability/calendar RPC lookups (e.g. POST /api/availability).
-        if upper_method in {"POST", "PUT", "PATCH", "DELETE"}:
-            has_write_kw = any(k in path_and_query for k in _WRITE_BLOCKED_KEYWORDS)
-            if has_write_kw:
-                # Allow ONLY when the path is clearly an availability/calendar read lookup
-                # and does NOT mention explicit mutation verbs.
-                explicit_mutation = any(
-                    m in path_and_query
-                    for m in (
-                        "create",
-                        "submit",
-                        "confirm",
-                        "checkout",
-                        "pay",
-                        "cart",
-                        "reserve",
-                        "hold",
-                        "otp",
-                        "passenger",
-                        "visitor",
-                        "book-ticket",
-                    )
-                )
-                is_read_lookup = any(h in path for h in _READ_ONLY_PATH_HINTS)
-                if explicit_mutation or not is_read_lookup:
+        # Block top-level document navigation into booking/checkout/payment pages
+        if res_type == "document":
+            for forbidden in FORBIDDEN_URL_SEGMENTS:
+                if path == forbidden or path.startswith(f"{forbidden}/"):
                     return True
+            return False
+
+        # On write verbs (POST/PUT/PATCH/DELETE), block any order/cart/hold/OTP/payment call
+        if upper_method in {"POST", "PUT", "PATCH", "DELETE"}:
+            for pattern in _MUTATING_BOOKING_PATH_PATTERNS:
+                if pattern.search(path):
+                    return True
+
         return False
