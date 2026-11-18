@@ -1,0 +1,33 @@
+# Environment & local secrets
+.env
+.env.local
+
+# Python virtual environments & caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local SQLite databases, screenshots, inspection dumps & exported reports
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+data/screenshots/*
+!data/screenshots/.gitkeep
+data/exports/*
+!data/exports/.gitkeep
+data/inspection/*
+!data/inspection/.gitkeep
+data/browser_profile/
+data/.collector.lock
+
+# Local verified selector overrides (keep selectors.example.json in git)
+config/selectors.json
+
+# OS files
+.DS_Store
+Thumbs.db
