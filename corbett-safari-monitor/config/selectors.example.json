@@ -1,0 +1,37 @@
+{
+  "_comment": "Selector contract for https://safari.corbettgov.org/. DO NOT GUESS SELECTORS. Run `python scripts/inspect_portal.py --interactive` once in a local browser to populate and verify this file.",
+  "verified": false,
+  "verified_at": null,
+  "verified_by": null,
+  "portal_url": "https://safari.corbettgov.org/",
+  "unit_validation": {
+    "jeep_slots_confirmed_meaning": null,
+    "canter_slots_confirmed_meaning": null,
+    "capacity_displayed_on_portal": false
+  },
+  "consent_modals": {
+    "tourist_instructions_close": "",
+    "important_info_acknowledge": ""
+  },
+  "navigation": {
+    "date_picker_trigger": "",
+    "date_cell_template": "",
+    "calendar_next_month_selector": "",
+    "date_url_template": "",
+    "date_status_selector": "",
+    "zone_card_selector": "",
+    "zone_name_selector": "",
+    "zone_id_attribute": "",
+    "zone_expand_selector": "",
+    "zone_dropdown_selector": "",
+    "zone_dropdown_options": [],
+    "zone_url_templates": {}
+  },
+  "availability": {
+    "morning_availability_selector": "",
+    "morning_capacity_selector": "",
+    "afternoon_availability_selector": "",
+    "afternoon_capacity_selector": "",
+    "source_section_label": "calendar_zone_availability"
+  }
+}
