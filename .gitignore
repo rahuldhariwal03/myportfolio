@@ -1,0 +1,8 @@
+# Build output is committed deliberately for the plugin deliverable, but keep
+# scratch files, OS noise and local tooling out of the repository.
+.DS_Store
+Thumbs.db
+*.log
+*~
+node_modules/
+.cache/

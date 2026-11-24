@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TrustUsBro Site Manager — Interactive Demo</title>
+<meta name="robots" content="noindex" />
+<style>
+	:root {
+		--ink: #111111;
+		--muted: #6b6b6b;
+		--line: #e0e0e0;
+		--orange: #ff6a00;
+		--bg: #f6f6f6;
+		--font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		--mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	}
+	* { box-sizing: border-box; }
+	body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--bg); font-size: 14px; line-height: 1.5; }
+	h1, h2, h3 { margin: 0; letter-spacing: -0.01em; }
+	a { color: inherit; }
+	button { font: inherit; }
+
+	.demo-banner {
+		display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+		padding: 10px 20px; background: var(--ink); color: #fff; font-size: 12.5px;
+	}
+	.demo-banner strong { color: #fff; }
+	.demo-banner__tag {
+		display: inline-block; margin-right: 10px; padding: 2px 8px;
+		background: var(--orange); color: var(--ink); font-weight: 700;
+		font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+	}
+	.demo-banner a { color: #fff; text-underline-offset: 3px; }
+
+	.app { display: flex; min-height: calc(100vh - 40px); }
+
+	.sidebar {
+		width: 240px; flex: 0 0 240px; background: var(--ink); color: #f5f5f5;
+		padding: 20px 0 24px; display: flex; flex-direction: column; gap: 18px;
+		position: sticky; top: 0; align-self: flex-start; max-height: 100vh; overflow-y: auto;
+	}
+	.brand { display: flex; align-items: center; gap: 10px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,.12); }
+	.brand__mark {
+		display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
+		background: var(--orange); color: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: .04em;
+	}
+	.brand__title { display: block; font-size: 13px; font-weight: 600; }
+	.brand__sub { display: block; font-size: 10px; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .12em; }
+	.navgroup { display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
+	.navgroup__label { padding: 6px 12px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+	.navitem {
+		display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+		color: rgba(255,255,255,.82); text-decoration: none; font-size: 13px; background: none; border: 0;
+		text-align: left; width: 100%; cursor: pointer;
+	}
+	.navitem:hover { background: rgba(255,255,255,.08); color: #fff; }
+	.navitem.is-active { background: #fff; color: var(--ink); font-weight: 600; }
+	.navitem__icon { width: 16px; height: 16px; flex: 0 0 16px; opacity: .75; }
+	.navitem.is-active .navitem__icon { opacity: 1; }
+	.navitem .badge { margin-left: auto; color: var(--orange); font-size: 10px; }
+
+	.main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; padding-bottom: 90px; }
+	.topbar {
+		display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between;
+		padding: 26px 32px 18px; background: #fff; border-bottom: 1px solid var(--line);
+		position: sticky; top: 0; z-index: 20;
+	}
+	.topbar__title { font-size: 22px; font-weight: 600; }
+	.topbar__sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; max-width: 70ch; }
+	.body { padding: 24px 32px 40px; }
+	.stack { display: flex; flex-direction: column; gap: 20px; }
+
+	.btn {
+		display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+		padding: 6px 14px; border: 1px solid #c9c9c9; background: #fff; color: var(--ink);
+		font-size: 13px; cursor: pointer; text-decoration: none; line-height: 1.5;
+	}
+	.btn:hover { border-color: var(--ink); }
+	.btn:disabled { opacity: .45; cursor: not-allowed; }
+	.btn--primary { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 600; }
+	.btn--primary:hover:not(:disabled) { background: #000; }
+	.btn--danger { color: #b32d2e; }
+	.btn--small { padding: 3px 10px; font-size: 12px; }
+
+	.toolbar {
+		display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+		padding: 12px 16px; background: #fff; border: 1px solid var(--line);
+	}
+	.toolbar__hint { font-size: 12.5px; color: var(--muted); max-width: 70ch; }
+
+	.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); background: #fff; }
+	.card { padding: 22px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; min-height: 150px; }
+	.card__title { font-size: 15px; font-weight: 600; }
+	.card__text { margin: 0; color: var(--muted); font-size: 13px; }
+	.card .link { margin-top: auto; }
+
+	.link { color: #b34a00; text-decoration: none; font-weight: 500; background: none; border: 0; padding: 0; cursor: pointer; font-size: 13px; }
+	.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+	.callout {
+		display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; padding: 14px 18px;
+		background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--ink); font-size: 13px;
+	}
+	.callout--attention { border-left-color: var(--orange); background: #fff8f2; }
+
+	.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); background: #fff; }
+	.stat { padding: 18px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+	.stat__value { font-size: 24px; font-weight: 600; line-height: 1; }
+	.stat.is-warn .stat__value { color: #b34a00; }
+	.stat__label { font-size: 12px; color: var(--muted); }
+
+	.tabs { display: flex; border-bottom: 2px solid var(--ink); }
+	.tab { padding: 10px 18px; border: 1px solid var(--line); border-bottom: none; background: #fff; color: var(--muted); cursor: pointer; }
+	.tab.is-active { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 600; }
+
+	.sections { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+	.section { background: #fff; border: 1px solid var(--line); }
+	.section.is-hidden { border-style: dashed; opacity: .72; }
+	.section.is-dragging { opacity: .4; }
+	.section.is-drop-target { outline: 2px solid var(--orange); outline-offset: -2px; }
+	.section__head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #fbfbfb; border-bottom: 1px solid var(--line); }
+	.section.is-collapsed .section__head { border-bottom: none; }
+	.drag { cursor: grab; color: #9a9a9a; font-size: 16px; line-height: 1; padding: 0 2px; user-select: none; }
+	.section__title { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; flex: 1 1 auto; min-width: 0; padding: 4px 0; background: none; border: 0; text-align: left; cursor: pointer; }
+	.section__label { font-weight: 600; font-size: 14px; }
+	.section__meta { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+	.tools { display: flex; gap: 2px; flex: 0 0 auto; }
+	.iconbtn {
+		width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+		border: 1px solid transparent; background: none; color: #555; font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+	}
+	.iconbtn:hover { border-color: var(--line); background: #fff; color: var(--ink); }
+	.iconbtn--danger:hover { color: #d63638; border-color: #f0b3b3; background: #fff5f5; }
+	.section__body { padding: 18px; }
+	.section__foot { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 12.5px; }
+
+	.fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px 24px; }
+	.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+	.field--wide { grid-column: 1 / -1; }
+	.field__label { font-size: 12px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: #333; }
+	.field input[type=text], .field input[type=url], .field input[type=email], .field input[type=tel], .field input[type=number], .field select, .field textarea, .inline-form input, .toolbar input {
+		width: 100%; padding: 8px 10px; border: 1px solid #c9c9c9; border-radius: 0; background: #fff; font: inherit; color: var(--ink);
+	}
+	.field input:focus, .field select:focus, .field textarea:focus, .inline-form input:focus, .toolbar input:focus { outline: 2px solid var(--orange); outline-offset: 0; border-color: var(--ink); }
+	.help { margin: 0; font-size: 12px; color: var(--muted); }
+	.toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+	.colorfield { display: flex; gap: 8px; align-items: center; }
+	.colorfield input[type=color] { width: 44px; height: 34px; padding: 0; border: 1px solid #c9c9c9; background: none; }
+
+	.repeater { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: #fafafa; border: 1px solid var(--line); }
+	.repeater__row { background: #fff; border: 1px solid var(--line); }
+	.repeater__row.is-drop-target { outline: 2px solid var(--orange); outline-offset: -2px; }
+	.repeater__head { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); background: #fbfbfb; }
+	.repeater__index { flex: 1 1 auto; font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.repeater__row .fields { padding: 14px; }
+	.repeater__add { align-self: flex-start; }
+
+	.collection { background: #fff; border: 1px solid var(--line); }
+	.collection.is-hidden { border-style: dashed; opacity: .7; }
+	.collection.is-drop-target { outline: 2px solid var(--orange); outline-offset: -2px; }
+	.collection__head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #fbfbfb; border-bottom: 1px solid var(--line); }
+	.collection__title { flex: 1 1 auto; font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.collection > .fields { padding: 18px; }
+
+	.imagefield__preview { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px dashed #c9c9c9; background: #fafafa; min-height: 64px; }
+	.imagefield__preview img { max-width: 120px; max-height: 80px; object-fit: cover; }
+	.imagefield__empty { font-size: 12px; color: var(--muted); }
+
+	.table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); font-size: 13px; }
+	.table th { text-align: left; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); background: #fbfbfb; font-weight: 600; }
+	.table td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+	.table__actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+	.pill { display: inline-block; padding: 2px 8px; border: 1px solid var(--line); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+	.pill--ok { border-color: #8bc88b; background: #f1fbf1; color: #1c6b1c; }
+	.pill--warn { border-color: #f0c08a; background: #fff8f2; color: #8a4b00; }
+
+	.panel { background: #fff; border: 1px solid var(--line); padding: 18px 20px; }
+	.panel > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+	.panel__title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+	.panel__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+	.plainlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+	.inline-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+	.h2 { font-size: 16px; font-weight: 600; margin-top: 8px; }
+
+	.savebar {
+		position: fixed; bottom: 0; left: 240px; right: 0; z-index: 100;
+		display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+		padding: 12px 24px; background: var(--ink); color: #fff; border-top: 1px solid #333;
+	}
+	.savebar__status { font-size: 13px; color: rgba(255,255,255,.8); display: inline-flex; align-items: center; gap: 8px; }
+	.savebar__status.is-dirty { color: #ffb37a; }
+	.savebar__status.is-clean { color: #9ddc9d; }
+	.savebar__status::before { content: ""; width: 8px; height: 8px; background: currentColor; display: inline-block; }
+	.savebar__actions { display: flex; gap: 8px; align-items: center; }
+	.savebar .btn { background: transparent; border-color: rgba(255,255,255,.4); color: #fff; }
+	.savebar .btn:hover:not(:disabled) { background: rgba(255,255,255,.1); border-color: #fff; }
+	.savebar .btn--primary { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+	.savebar .btn:disabled { opacity: .4; }
+
+	.toast {
+		position: fixed; bottom: 84px; right: 24px; z-index: 200; display: flex; align-items: center; gap: 12px;
+		max-width: 460px; padding: 12px 16px; background: var(--ink); color: #fff; border-left: 4px solid var(--orange); font-size: 13px;
+		box-shadow: 0 8px 24px rgba(0,0,0,.18);
+	}
+	.toast--error { border-left-color: #d63638; }
+	.toast--success { border-left-color: #46b450; }
+	.toast__text { flex: 1 1 auto; }
+	.toast button { background: none; border: 1px solid rgba(255,255,255,.4); color: #fff; font: inherit; font-size: 12px; padding: 4px 10px; cursor: pointer; }
+	.toast__close { border-color: transparent !important; font-size: 16px !important; padding: 4px 8px !important; }
+
+	.modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.55); display: flex; align-items: flex-start; justify-content: center; padding: 8vh 20px 20px; overflow-y: auto; }
+	.modal__box { width: 100%; max-width: 640px; background: #fff; border-top: 4px solid var(--orange); padding: 24px; }
+	.modal__title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+	.modal__actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+	.addlist { display: grid; gap: 0; margin-top: 18px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+	.addlist__item { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: #fff; border: none; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; cursor: pointer; }
+	.addlist__item:hover { background: #fff8f2; outline: 2px solid var(--orange); outline-offset: -2px; }
+	.addlist__label { font-weight: 600; font-size: 14px; }
+	.addlist__desc { font-size: 12.5px; color: var(--muted); }
+
+	.empty-state { padding: 40px 24px; background: #fff; border: 1px dashed #c9c9c9; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+	.error { padding: 14px 18px; background: #fff1f0; border-left: 4px solid #d63638; }
+
+	@media (max-width: 900px) {
+		.app { flex-direction: column; }
+		.sidebar { width: 100%; flex: 0 0 auto; position: static; max-height: none; }
+		.fields { grid-template-columns: minmax(0, 1fr); }
+		.savebar { left: 0; }
+		.body, .topbar { padding-left: 16px; padding-right: 16px; }
+	}
+</style>
+</head>
+<body>
+<div class="demo-banner">
+	<span>
+		<span class="demo-banner__tag">Interactive demo</span>
+		<strong>This is the real TrustUsBro Site Manager UI</strong> running on sample content. Nothing here touches a live website — edits stay in your browser.
+	</span>
+	<span>
+		<a href="./site-preview.html">See the rendered website →</a>
+	</span>
+</div>
+
+<div class="app">
+	<nav class="sidebar" id="sidebar" aria-label="Site Manager sections"></nav>
+	<main class="main">
+		<header class="topbar">
+			<div>
+				<h1 class="topbar__title" id="view-title">Welcome back</h1>
+				<p class="topbar__sub" id="view-sub"></p>
+			</div>
+		</header>
+		<div class="body" id="view-body"></div>
+	</main>
+</div>
+
+<script>
+/*
+ * Standalone demo of the Site Manager dashboard.
+ *
+ * It is *the same interface* as the WordPress plugin, re-implemented as a single
+ * dependency-free file so the owner can try click-to-edit and drag-and-drop
+ * before installing anything. All data comes from demo-data.json (a real export
+ * of the plugin's REST payload) and edits are kept in localStorage only.
+ */
+(function () {
+	'use strict';
+
+	var LS_KEY = 'tusb-demo-v1';
+	var TUSB = {
+		restUrl: 'demo://',
+		nonce: 'demo',
+		adminUrl: '#',
+		pageUrl: '#',
+		siteUrl: './site-preview.html',
+		media: { libraryTitle: 'Choose an image (demo)', libraryButton: 'Use this image' }
+	};
+	window.TUSB = TUSB;
+
+	var app = document.getElementById('sidebar');
+	var state = {
+		boot: null,
+		view: 'dashboard',
+		doc: '',
+		docs: {},
+		draft: null,
+		draftDoc: '',
+		dirty: false,
+		saving: false,
+		collapsed: {},
+		saveBar: null,
+		toastTimer: null
+	};
+
+	/* ---------------- utilities ---------------- */
+
+	function el(tag, attrs, children) {
+		var node = document.createElement(tag);
+		if (attrs) {
+			Object.keys(attrs).forEach(function (key) {
+				var value = attrs[key];
+				if (value === null || value === undefined || value === false) { return; }
+				if (key === 'class') { node.className = value; }
+				else if (key === 'text') { node.textContent = value; }
+				else if (key === 'html') { node.innerHTML = value; }
+				else if (key.indexOf('on') === 0 && typeof value === 'function') { node.addEventListener(key.slice(2).toLowerCase(), value); }
+				else if (value === true) { node.setAttribute(key, ''); }
+				else { node.setAttribute(key, value); }
+			});
+		}
+		(children || []).forEach(function (child) {
+			if (child === null || child === undefined || child === false) { return; }
+			node.appendChild(typeof child === 'string' || typeof child === 'number' ? document.createTextNode(String(child)) : child);
+		});
+		return node;
+	}
+	function q(sel, root) { return (root || document).querySelector(sel); }
+	function qa(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+	function clone(v) { return JSON.parse(JSON.stringify(v === undefined ? null : v)); }
+	function debounce(fn, wait) {
+		var timer;
+		return function () {
+			var args = arguments, ctx = this;
+			clearTimeout(timer);
+			timer = setTimeout(function () { fn.apply(ctx, args); }, wait);
+		};
+	}
+	function labelOf(key) {
+		return (state.boot && state.boot.defaults.doc_labels && state.boot.defaults.doc_labels[key]) || key.replace(/_/g, ' ');
+	}
+	function titleForView() {
+		var titles = { dashboard: 'Welcome back', pages: 'Homepage & pages', blog: 'Blog', seo: 'SEO', media: 'Media library', backups: 'Backups & recovery', revisions: 'Revision history', health: 'Health & help' };
+		if (titles[state.view]) { return titles[state.view]; }
+		if (VIEW_TO_DOC[state.view]) { return labelOf(VIEW_TO_DOC[state.view]); }
+		return 'Site Manager';
+	}
+	function subtitleForView() {
+		var subs = {
+			dashboard: 'Everything on your website, in plain language. Nothing goes live until you press Publish.',
+			pages: 'Reorder, hide, duplicate and edit every homepage section. Click a title to expand it.',
+			blog: 'Native WordPress posts and categories.',
+			seo: 'Titles, descriptions, sitemap and structured data.',
+			media: 'Images used across the site with alt text and usage.',
+			backups: 'Automatic and manual snapshots. Restore with one click.',
+			revisions: 'Every saved version with who changed what and when.',
+			health: 'Compatibility, permissions and a quick self-test.'
+		};
+		if (subs[state.view]) { return subs[state.view]; }
+		return 'These settings appear site-wide. Nothing goes live until you press Publish.';
+	}
+	function toast(message, type) {
+		var existing = q('.toast');
+		if (existing) { existing.remove(); }
+		var node = el('div', { class: 'toast toast--' + (type || 'info'), role: 'status', 'aria-live': 'polite' }, [
+			el('span', { class: 'toast__text', text: message }),
+			el('button', { class: 'toast__close', type: 'button', 'aria-label': 'Dismiss', text: '×', onclick: function () { node.remove(); } })
+		]);
+		document.body.appendChild(node);
+		clearTimeout(state.toastTimer);
+		state.toastTimer = setTimeout(function () { node.remove(); }, type === 'error' ? 9000 : 5000);
+	}
+
+	/* ---------------- fake persistence (localStorage) ---------------- */
+
+	function persist() {
+		try {
+			var out = {};
+			Object.keys(state.docs).forEach(function (k) {
+				out[k] = { draft: state.docs[k].draft, published: state.docs[k].published, meta: state.docs[k].meta, has_unpublished: state.docs[k].has_unpublished };
+			});
+			localStorage.setItem(LS_KEY, JSON.stringify(out));
+		} catch (e) { /* private mode: demo still works in memory */ }
+	}
+	function restore() {
+		try {
+			var raw = localStorage.getItem(LS_KEY);
+			return raw ? JSON.parse(raw) : null;
+		} catch (e) { return null; }
+	}
+
+	/* ---------------- data ---------------- */
+
+	function loadData() {
+		var saved = restore();
+		return fetch('./demo-data.json').then(function (r) { return r.json(); }).then(function (bundle) {
+			state.boot = bundle.bootstrap;
+			Object.keys(bundle.docs).forEach(function (key) {
+				var doc = bundle.docs[key];
+				doc.meta = doc.meta || {};
+				doc.has_unpublished = Boolean(doc.has_unpublished);
+				if (saved && saved[key]) {
+					doc.draft = saved[key].draft || doc.draft;
+					doc.published = saved[key].published || doc.published;
+					doc.has_unpublished = Boolean(saved[key].has_unpublished);
+				}
+				state.docs[key] = doc;
+			});
+			state.boot.blog = bundle.blog;
+			state.boot.backups = bundle.backups;
+			state.boot.seoReport = bundle.seo;
+			return true;
+		});
+	}
+
+	var VIEW_TO_DOC = { services: 'services', industries: 'industries', case_studies: 'case_studies', testimonials: 'testimonials', faq: 'faq', header: 'header', footer: 'footer', contact: 'contact', design: 'design' };
+
+	var NAV = [
+		{ group: 'Home', items: [
+			{ view: 'dashboard', label: 'Overview', icon: 'grid' },
+			{ view: 'pages', label: 'Homepage & pages', icon: 'page' }
+		]},
+		{ group: 'Content', items: [
+			{ view: 'services', label: 'Services', icon: 'layers' },
+			{ view: 'industries', label: 'Industries', icon: 'building' },
+			{ view: 'case_studies', label: 'Case studies', icon: 'briefcase' },
+			{ view: 'testimonials', label: 'Testimonials', icon: 'quote' },
+			{ view: 'faq', label: 'FAQ', icon: 'help' },
+			{ view: 'blog', label: 'Blog', icon: 'post' }
+		]},
+		{ group: 'Layout', items: [
+			{ view: 'header', label: 'Header', icon: 'header' },
+			{ view: 'footer', label: 'Footer', icon: 'footer' },
+			{ view: 'contact', label: 'Contact details', icon: 'mail' }
+		]},
+		{ group: 'Site', items: [
+			{ view: 'design', label: 'Design settings', icon: 'palette' },
+			{ view: 'seo', label: 'SEO', icon: 'search' },
+			{ view: 'media', label: 'Media', icon: 'image' },
+			{ view: 'backups', label: 'Backups', icon: 'db' },
+			{ view: 'revisions', label: 'Revision history', icon: 'clock' },
+			{ view: 'health', label: 'Health & help', icon: 'health' }
+		]}
+	];
+
+	var ICONS = {
+		grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+		page: 'M5 3h9l5 5v13H5zM14 3v5h5',
+		layers: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17l9 5 9-5',
+		building: 'M4 21V6l8-3v18M12 21h8V10h-8M7 9v.01M7 13v.01M7 17v.01M16 13v.01M16 17v.01',
+		briefcase: 'M3 8h18v12H3zM9 8V5h6v3',
+		quote: 'M9 7H5v5h4c0 3-1 4-3 5M19 7h-4v5h4c0 3-1 4-3 5',
+		help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7M12 17v.01',
+		post: 'M5 3h14v18H5zM8 8h8M8 12h8M8 16h5',
+		header: 'M3 5h18v4H3zM3 12h18v7H3z',
+		footer: 'M3 5h18v7H3zM3 15h18v4H3z',
+		mail: 'M3 6h18v12H3zM3 6l9 7 9-7',
+		palette: 'M12 21a9 9 0 1 1 9-9c0 2-2 3-3 3h-2a2 2 0 0 0-2 2c0 1 1 1 1 2s-1 2-3 2zM8 8v.01M12 6v.01M16 8v.01',
+		search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM16 16l5 5',
+		image: 'M3 4h18v16H3zM8.5 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM21 16l-5-5-8 8',
+		db: 'M12 3c4.4 0 8 1.1 8 2.5S16.4 8 12 8 4 6.9 4 5.5 7.6 3 12 3zM4 5.5v13C4 19.9 7.6 21 12 21s8-1.1 8-2.5v-13M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5',
+		clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+		health: 'M3 12h4l2-5 3 10 2-5h7'
+	};
+	function icon(name) {
+		return el('span', { class: 'navitem__icon', 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + (ICONS[name] || ICONS.grid) + '"/></svg>' });
+	}
+
+	/* ---------------- render shell ---------------- */
+
+	function render() {
+		renderSidebar();
+		q('#view-title').textContent = titleForView();
+		q('#view-sub').textContent = subtitleForView();
+		var body = q('#view-body');
+		body.innerHTML = '';
+		state.saveBar = null;
+
+		if (state.view === 'dashboard') { body.appendChild(renderDashboard()); }
+		else if (state.view === 'pages') { body.appendChild(renderPages()); }
+		else if (state.view === 'blog') { body.appendChild(renderBlog()); }
+		else if (state.view === 'seo') { body.appendChild(renderSeo()); }
+		else if (state.view === 'media') { body.appendChild(renderMedia()); }
+		else if (state.view === 'backups') { body.appendChild(renderBackups()); }
+		else if (state.view === 'revisions') { body.appendChild(renderRevisions()); }
+		else if (state.view === 'health') { body.appendChild(renderHealth()); }
+		else if (VIEW_TO_DOC[state.view]) { body.appendChild(renderDocEditor(VIEW_TO_DOC[state.view])); }
+
+		if (docNeedsSaveBar()) { document.body.appendChild(renderSaveBar()); }
+		updateSaveBar();
+	}
+
+	function renderSidebar() {
+		app.innerHTML = '';
+		app.appendChild(el('div', { class: 'brand' }, [
+			el('span', { class: 'brand__mark', 'aria-hidden': 'true', text: 'BRO' }),
+			el('div', {}, [el('span', { class: 'brand__title', text: 'Site Manager' }), el('span', { class: 'brand__sub', text: 'TrustUsBro' })])
+		]));
+		NAV.forEach(function (group) {
+			var section = el('div', { class: 'navgroup' }, [el('span', { class: 'navgroup__label', text: group.group })]);
+			group.items.forEach(function (item) {
+				var active = item.view === state.view;
+				var docKey = VIEW_TO_DOC[item.view];
+				var pending = docKey && state.docs[docKey] && state.docs[docKey].has_unpublished;
+				section.appendChild(el('button', {
+					class: 'navitem' + (active ? ' is-active' : ''),
+					type: 'button',
+					'aria-current': active ? 'page' : null,
+					onclick: function () {
+						if (state.dirty && !confirm('You have unsaved changes. Discard them and leave this screen?')) { return; }
+						state.view = item.view;
+						state.dirty = false;
+						state.draft = null;
+						state.draftDoc = '';
+						state.doc = docKey || '';
+						render();
+					}
+				}, [icon(item.icon), el('span', { text: item.label }), pending ? el('span', { class: 'badge', text: '●', title: 'Unpublished changes' }) : null]));
+			});
+			app.appendChild(section);
+		});
+		app.appendChild(el('div', { style: 'margin-top:auto;padding:16px 20px 0;border-top:1px solid rgba(255,255,255,.12);font-size:12px' }, [
+			el('a', { href: './site-preview.html', style: 'color:rgba(255,255,255,.8);text-decoration:none', text: 'View website ↗' })
+		]));
+	}
+
+	function docNeedsSaveBar() {
+		return state.view === 'pages' || state.view === 'seo' || Boolean(VIEW_TO_DOC[state.view]);
+	}
+
+	function renderSaveBar() {
+		state.saveBar = el('div', { class: 'savebar', role: 'region', 'aria-label': 'Save and publish' }, [
+			el('div', { class: 'savebar__status', id: 'save-status' }),
+			el('div', { class: 'savebar__actions' }, [
+				el('button', { class: 'btn', type: 'button', id: 'btn-discard', onclick: discard, text: 'Discard draft changes' }),
+				el('button', { class: 'btn', type: 'button', id: 'btn-save', onclick: function () { saveDraft(); }, text: 'Save draft' }),
+				el('button', { class: 'btn btn--primary', type: 'button', id: 'btn-publish', onclick: publish, text: 'Publish changes' })
+			])
+		]);
+		return state.saveBar;
+	}
+
+	function updateSaveBar() {
+		var status = q('#save-status');
+		if (!status) { return; }
+		var doc = state.docs[state.doc];
+		var text, cls = 'savebar__status';
+		if (state.saving) { text = 'Saving…'; cls += ' is-busy'; }
+		else if (state.dirty) { text = 'Unsaved changes in this browser'; cls += ' is-dirty'; }
+		else if (doc && doc.has_unpublished) { text = 'Draft saved. Not live yet — press Publish changes.'; cls += ' is-dirty'; }
+		else { text = 'All changes are live.'; cls += ' is-clean'; }
+		status.className = cls;
+		status.textContent = text;
+		var saveBtn = q('#btn-save'), publishBtn = q('#btn-publish');
+		if (saveBtn) { saveBtn.disabled = state.saving || !state.dirty; }
+		if (publishBtn) { publishBtn.disabled = state.saving || (!state.dirty && !(doc && doc.has_unpublished)); }
+	}
+
+	function markDirty() { state.dirty = true; updateSaveBar(); }
+
+	function saveDraft() {
+		var doc = state.docs[state.doc];
+		if (!doc || state.saving) { return; }
+		state.saving = true;
+		updateSaveBar();
+		setTimeout(function () {
+			state.saving = false;
+			state.dirty = false;
+			doc.draft = clone(state.draft);
+			doc.has_unpublished = true;
+			doc.meta = doc.meta || {};
+			doc.meta.draft_version = (doc.meta.draft_version || 0) + 1;
+			persist();
+			updateSaveBar();
+			toast('Draft saved — press Publish changes to update the live site.', 'success');
+		}, 250);
+	}
+
+	function publish() {
+		var doc = state.docs[state.doc];
+		if (!doc || state.saving) { return; }
+		if (state.dirty) {
+			doc.draft = clone(state.draft);
+		}
+		state.saving = true;
+		updateSaveBar();
+		setTimeout(function () {
+			state.saving = false;
+			state.dirty = false;
+			doc.published = clone(doc.draft);
+			doc.has_unpublished = false;
+			doc.meta = doc.meta || {};
+			doc.meta.published_version = (doc.meta.published_version || 0) + 1;
+			persist();
+			updateSaveBar();
+			toast('Published — your website is updated. A backup was created first.', 'success');
+		}, 300);
+	}
+
+	function discard() {
+		if (!confirm('Discard all unpublished changes for this screen?')) { return; }
+		var doc = state.docs[state.doc];
+		doc.draft = clone(doc.published);
+		doc.has_unpublished = false;
+		state.draft = clone(doc.published);
+		state.draftDoc = state.doc;
+		state.dirty = false;
+		persist();
+		render();
+		toast('Draft discarded — the published version is unchanged.', 'success');
+	}
+
+	function ensureDraft(docKey) {
+		if (!state.docs[docKey]) { return false; }
+		if (!state.draft || state.draftDoc !== docKey) {
+			state.draft = clone(state.docs[docKey].draft);
+			state.draftDoc = docKey;
+			state.dirty = false;
+		}
+		state.doc = docKey;
+		return true;
+	}
+
+	/* ---------------- dashboard ---------------- */
+
+	function renderDashboard() {
+		var wrap = el('div', { class: 'stack' });
+		var pending = Object.keys(state.docs).filter(function (k) { return state.docs[k].has_unpublished; });
+		if (pending.length) {
+			wrap.appendChild(el('div', { class: 'callout callout--attention' }, [
+				el('strong', { text: 'You have unpublished changes in ' + pending.length + ' area' + (pending.length > 1 ? 's' : '') + '.' }),
+				el('span', { text: ' ' + pending.map(labelOf).join(', ') + '.' }),
+				el('button', { class: 'link', type: 'button', text: 'Review and publish →', onclick: function () { state.view = 'pages'; state.doc = 'home'; render(); } })
+			]));
+		}
+		var cards = [
+			['Homepage', 'Reorder, hide, duplicate and edit every homepage section.', 'pages'],
+			['Services & industries', 'Add cards; they appear wherever those sections are used.', 'services'],
+			['Case studies & testimonials', 'Show real results and client quotes.', 'case_studies'],
+			['Header & footer', 'Logo, menu, buttons and the four-column footer.', 'header'],
+			['Blog', 'Write, schedule and categorise articles.', 'blog'],
+			['SEO', 'Titles, descriptions, sitemap and schema.', 'seo'],
+			['Backups', 'Create or restore a snapshot before big changes.', 'backups'],
+			['Design settings', 'Colours and fonts inherited from your theme.', 'design']
+		];
+		var grid = el('div', { class: 'cards' });
+		cards.forEach(function (card) {
+			grid.appendChild(el('div', { class: 'card' }, [
+				el('h2', { class: 'card__title', text: card[0] }),
+				el('p', { class: 'card__text', text: card[1] }),
+				el('button', { class: 'link', type: 'button', text: 'Open →', onclick: function () { state.view = card[2]; state.doc = VIEW_TO_DOC[card[2]] || ''; render(); } })
+			]));
+		});
+		wrap.appendChild(grid);
+		wrap.appendChild(el('div', { class: 'callout' }, [
+			el('strong', { text: 'How this works: ' }),
+			el('span', { text: 'changes are saved as a draft first. Visitors keep seeing the published version until you press Publish changes. Every publish creates a backup and a revision you can restore.' })
+		]));
+		return wrap;
+	}
+
+	/* ---------------- pages ---------------- */
+
+	function renderPages() {
+		var wrap = el('div', { class: 'stack' });
+		var docs = state.boot.defaults.page_docs;
+		var keys = Object.keys(docs);
+		var active = state.doc && docs[state.doc] ? state.doc : keys[0];
+		var tabs = el('div', { class: 'tabs', role: 'tablist' });
+		keys.forEach(function (key) {
+			tabs.appendChild(el('button', {
+				class: 'tab' + (key === active ? ' is-active' : ''),
+				type: 'button', role: 'tab', 'aria-selected': key === active ? 'true' : 'false',
+				onclick: function () {
+					if (state.dirty && !confirm('You have unsaved changes on this screen. Discard them?')) { return; }
+					state.doc = key; state.draft = null; state.draftDoc = ''; state.dirty = false; render();
+				}
+			}, [docs[key]]));
+		});
+		wrap.appendChild(tabs);
+		if (!ensureDraft(active)) { return wrap; }
+
+		wrap.appendChild(el('div', { class: 'toolbar' }, [
+			el('span', { class: 'toolbar__hint', text: 'Drag the ⠿ handle to reorder, or use the arrow buttons. Click a section title to expand it.' }),
+			el('button', { class: 'btn', type: 'button', text: '+ Add section', onclick: openAddSection })
+		]));
+
+		var list = el('ol', { class: 'sections', 'aria-label': 'Sections in order' });
+		state.draft.sections.forEach(function (section, index) { list.appendChild(renderSectionRow(section, index)); });
+		wrap.appendChild(list);
+
+		if (!state.draft.sections.length) {
+			wrap.appendChild(el('div', { class: 'empty-state' }, [
+				el('p', { text: 'This page has no sections yet.' }),
+				el('button', { class: 'btn btn--primary', type: 'button', text: 'Add the first section', onclick: openAddSection })
+			]));
+		}
+		return wrap;
+	}
+
+	function sectionDef(type) {
+		var doc = state.docs[state.doc];
+		return doc && doc.schema && doc.schema.sections ? doc.schema.sections[type] : null;
+	}
+
+	function renderSectionRow(section, index) {
+		var def = sectionDef(section.type) || { label: section.type, fields: {} };
+		var collapsed = state.collapsed[section.id];
+		var row = el('li', {
+			class: 'section' + (section.enabled ? '' : ' is-hidden') + (collapsed ? ' is-collapsed' : ''),
+			draggable: 'true'
+		});
+		row.addEventListener('dragstart', function (event) { event.dataTransfer.setData('text/plain', String(index)); row.classList.add('is-dragging'); });
+		row.addEventListener('dragend', function () { row.classList.remove('is-dragging'); });
+		row.addEventListener('dragover', function (event) { event.preventDefault(); row.classList.add('is-drop-target'); });
+		row.addEventListener('dragleave', function () { row.classList.remove('is-drop-target'); });
+		row.addEventListener('drop', function (event) {
+			event.preventDefault();
+			row.classList.remove('is-drop-target');
+			var from = parseInt(event.dataTransfer.getData('text/plain'), 10);
+			if (isNaN(from) || from === index) { return; }
+			var moved = state.draft.sections.splice(from, 1)[0];
+			state.draft.sections.splice(index, 0, moved);
+			markDirty();
+			render();
+			toast('Section moved. Remember to publish.', 'info');
+		});
+
+		row.appendChild(el('div', { class: 'section__head' }, [
+			el('span', { class: 'drag', 'aria-hidden': 'true', title: 'Drag to reorder', text: '⠿' }),
+			el('button', {
+				class: 'section__title', type: 'button', 'aria-expanded': collapsed ? 'false' : 'true',
+				onclick: function () { state.collapsed[section.id] = !state.collapsed[section.id]; render(); }
+			}, [
+				el('span', { class: 'section__label', text: def.label || section.type }),
+				el('span', { class: 'section__meta', text: sectionMeta(section) })
+			]),
+			el('div', { class: 'tools' }, [
+				el('button', { class: 'iconbtn', type: 'button', title: section.enabled ? 'Hide this section' : 'Show this section', 'aria-pressed': section.enabled ? 'true' : 'false', text: section.enabled ? '◉' : '○', onclick: function () { section.enabled = !section.enabled; markDirty(); render(); } }),
+				el('button', { class: 'iconbtn', type: 'button', title: 'Move up', 'aria-label': 'Move ' + def.label + ' up', text: '↑', onclick: function () { if (index > 0) { var m = state.draft.sections.splice(index, 1)[0]; state.draft.sections.splice(index - 1, 0, m); markDirty(); render(); } } }),
+				el('button', { class: 'iconbtn', type: 'button', title: 'Move down', 'aria-label': 'Move ' + def.label + ' down', text: '↓', onclick: function () { if (index < state.draft.sections.length - 1) { var m = state.draft.sections.splice(index, 1)[0]; state.draft.sections.splice(index + 1, 0, m); markDirty(); render(); } } }),
+				el('button', { class: 'iconbtn', type: 'button', title: 'Duplicate', 'aria-label': 'Duplicate ' + def.label, text: '⧉', onclick: function () {
+					var copy = clone(section);
+					copy.id = section.type + '-' + Math.random().toString(36).slice(2, 8);
+					copy.enabled = false;
+					state.draft.sections.splice(index + 1, 0, copy);
+					markDirty(); render(); toast('Section duplicated (hidden until you show it).', 'info');
+				} }),
+				el('button', { class: 'iconbtn iconbtn--danger', type: 'button', title: 'Remove section', 'aria-label': 'Remove ' + def.label, text: '✕', onclick: function () {
+					if (!confirm('Remove this section from the page? You can undo this immediately.')) { return; }
+					var removed = state.draft.sections.splice(index, 1)[0];
+					markDirty(); render();
+					toast('Section removed — this stays unpublished until you publish.', 'info');
+					var undoBtn = q('.toast button');
+					if (undoBtn) {
+						var undo = el('button', { type: 'button', text: 'Undo' });
+						undo.addEventListener('click', function () { state.draft.sections.splice(index, 0, removed); markDirty(); render(); });
+						undoBtn.replaceWith(undo);
+					}
+				} })
+			])
+		]));
+
+		if (!collapsed) {
+			var body = el('div', { class: 'section__body' });
+			body.appendChild(renderFields(def.fields || {}, section, ''));
+			if (def.description) { body.appendChild(el('p', { class: 'help', text: def.description })); }
+			var foot = el('div', { class: 'section__foot' }, [
+				def.source ? el('button', { class: 'link', type: 'button', text: 'Edit the ' + labelOf(def.source) + ' cards →', onclick: function () { state.view = def.source; state.draft = null; state.draftDoc = ''; state.dirty = false; render(); } }) : null,
+				el('a', { class: 'link', href: './site-preview.html#tusb-' + encodeURIComponent(section.id), target: '_blank', text: 'See it on the website ↗' })
+			]);
+			body.appendChild(foot);
+			row.appendChild(body);
+		}
+		return row;
+	}
+
+	function sectionMeta(section) {
+		var parts = [];
+		if (!section.enabled) { parts.push('hidden'); }
+		if (section.heading) { parts.push(section.heading.length > 48 ? section.heading.slice(0, 48) + '…' : section.heading); }
+		['steps', 'principles', 'buttons'].forEach(function (key) {
+			if (section[key] && section[key].length) { parts.push(section[key].length + ' ' + key); }
+		});
+		return parts.join(' · ');
+	}
+
+	function openAddSection() {
+		var doc = state.docs[state.doc];
+		var defs = doc.schema.sections;
+		var existing = state.draft.sections.map(function (s) { return s.type; });
+		var overlay = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'add-title' });
+		var box = el('div', { class: 'modal__box' }, [
+			el('h2', { class: 'modal__title', id: 'add-title', text: 'Add a section' }),
+			el('p', { class: 'help', text: 'Sections inherit your theme design automatically. New sections are added at the end and stay hidden until you show them.' })
+		]);
+		var list = el('div', { class: 'addlist' });
+		Object.keys(defs).forEach(function (type) {
+			var def = defs[type];
+			list.appendChild(el('button', {
+				class: 'addlist__item', type: 'button',
+				onclick: function () {
+					var section = { id: type + '-' + Math.random().toString(36).slice(2, 8), type: type, enabled: false };
+					Object.keys(def.fields || {}).forEach(function (key) { section[key] = defaultForField(def.fields[key]); });
+					state.draft.sections.push(section);
+					markDirty();
+					overlay.remove();
+					render();
+					toast('Section added (hidden). Press the ◉ button to show it.', 'info');
+				}
+			}, [
+				el('span', { class: 'addlist__label', text: def.label || type }),
+				el('span', { class: 'addlist__desc', text: def.description || '' }),
+				existing.indexOf(type) > -1 ? el('span', { class: 'addlist__desc', text: 'already on page' }) : null
+			]));
+		});
+		box.appendChild(list);
+		box.appendChild(el('div', { class: 'modal__actions' }, [el('button', { class: 'btn', type: 'button', text: 'Cancel', onclick: function () { overlay.remove(); } })]));
+		overlay.appendChild(box);
+		overlay.addEventListener('click', function (event) { if (event.target === overlay) { overlay.remove(); } });
+		document.body.appendChild(overlay);
+		box.querySelector('button').focus();
+	}
+
+	function defaultForField(field) {
+		if (field.default !== undefined) { return clone(field.default); }
+		switch (field.type) {
+			case 'repeater': return [];
+			case 'group':
+				var g = {};
+				Object.keys(field.fields || {}).forEach(function (k) { g[k] = defaultForField(field.fields[k]); });
+				return g;
+			case 'toggle': return false;
+			case 'number': return 0;
+			case 'image': return 0;
+			default: return '';
+		}
+	}
+
+	/* ---------------- fields ---------------- */
+
+	function renderFields(fields, values, prefix) {
+		var wrap = el('div', { class: 'fields' });
+		Object.keys(fields).forEach(function (key) {
+			var value = values && values[key] !== undefined ? values[key] : defaultForField(fields[key]);
+			wrap.appendChild(renderField(fields[key], value, key, values));
+		});
+		return wrap;
+	}
+
+	function renderField(field, value, key, parent) {
+		var label = field.label || key.replace(/_/g, ' ');
+		var wrap = el('div', { class: 'field' });
+
+		if (field.type === 'toggle') {
+			var cb = el('input', { type: 'checkbox', checked: Boolean(value) });
+			cb.addEventListener('change', function () { parent[key] = cb.checked; markDirty(); });
+			wrap.className = 'field field--wide';
+			wrap.appendChild(el('label', { class: 'toggle' }, [cb, el('span', { text: label })]));
+			if (field.help) { wrap.appendChild(el('p', { class: 'help', text: field.help })); }
+			return wrap;
+		}
+
+		if (field.type === 'repeater') { wrap.className = 'field field--wide'; wrap.appendChild(renderRepeater(field, value || [], label, parent, key)); if (field.help) { wrap.appendChild(el('p', { class: 'help', text: field.help })); } return wrap; }
+		if (field.type === 'group') { wrap.className = 'field field--wide'; wrap.appendChild(el('span', { class: 'field__label', text: label })); wrap.appendChild(renderFields(field.fields || {}, value || {}, '')); return wrap; }
+
+		wrap.appendChild(el('span', { class: 'field__label', text: label }));
+
+		if (field.type === 'textarea' || field.type === 'html') {
+			wrap.className = 'field field--wide';
+			var ta = el('textarea', { rows: field.type === 'html' ? 5 : 3 });
+			ta.value = value || '';
+			ta.addEventListener('input', debounce(function () { parent[key] = ta.value; markDirty(); }, 120));
+			wrap.appendChild(ta);
+		} else if (field.type === 'select') {
+			var sel = el('select');
+			Object.keys(field.options || {}).forEach(function (k) {
+				var o = el('option', { value: k, text: field.options[k] });
+				if (String(k) === String(value)) { o.selected = true; }
+				sel.appendChild(o);
+			});
+			sel.addEventListener('change', function () { parent[key] = sel.value; markDirty(); });
+			wrap.appendChild(sel);
+		} else if (field.type === 'number') {
+			var num = el('input', { type: 'number', value: value, min: field.min, max: field.max });
+			num.addEventListener('input', function () { parent[key] = parseInt(num.value, 10) || 0; markDirty(); });
+			wrap.appendChild(num);
+		} else if (field.type === 'image') {
+			var preview = el('div', { class: 'imagefield__preview' }, [el('span', { class: 'imagefield__empty', text: 'No image in this demo — in WordPress this opens the Media Library.' })]);
+			wrap.appendChild(preview);
+			wrap.appendChild(el('div', { style: 'display:flex;gap:8px' }, [
+				el('button', { class: 'btn', type: 'button', text: 'Choose image', onclick: function () { toast('In the WordPress plugin this opens the Media Library. Demo images are not included.', 'info'); } }),
+				el('button', { class: 'btn', type: 'button', text: 'Remove', onclick: function () { parent[key] = 0; markDirty(); toast('Image removed from the draft.', 'success'); } })
+			]));
+		} else if (field.type === 'color') {
+			var colorWrap = el('div', { class: 'colorfield' });
+			var color = el('input', { type: 'color', value: /^#[0-9a-f]{6}$/i.test(value || '') ? value : '#000000' });
+			var text = el('input', { type: 'text', value: value || '', placeholder: 'Inherit from theme' });
+			color.addEventListener('input', function () { parent[key] = color.value; text.value = color.value; markDirty(); });
+			text.addEventListener('input', function () { parent[key] = text.value; markDirty(); });
+			colorWrap.appendChild(color); colorWrap.appendChild(text);
+			wrap.appendChild(colorWrap);
+		} else {
+			var inputType = field.type === 'url' ? 'url' : field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : 'text';
+			var input = el('input', { type: inputType, value: value || '' });
+			input.addEventListener('input', debounce(function () { parent[key] = input.value; markDirty(); }, 120));
+			wrap.appendChild(input);
+		}
+		if (field.help) { wrap.appendChild(el('p', { class: 'help', text: field.help })); }
+		return wrap;
+	}
+
+	function renderRepeater(field, rows, label, parent, key) {
+		var wrap = el('div', { class: 'repeater' });
+		function repaint() {
+			wrap.innerHTML = '';
+			rows.forEach(function (row, index) {
+				var card = el('div', { class: 'repeater__row', draggable: 'true' });
+				card.appendChild(el('div', { class: 'repeater__head' }, [
+					el('span', { class: 'drag', 'aria-hidden': 'true', text: '⠿' }),
+					el('span', { class: 'repeater__index', text: rowTitle(row, index) }),
+					el('div', { class: 'tools' }, [
+						el('button', { class: 'iconbtn', type: 'button', text: '↑', title: 'Move up', onclick: function () { if (index > 0) { rows.splice(index - 1, 0, rows.splice(index, 1)[0]); markDirty(); repaint(); } } }),
+						el('button', { class: 'iconbtn', type: 'button', text: '↓', title: 'Move down', onclick: function () { if (index < rows.length - 1) { rows.splice(index + 1, 0, rows.splice(index, 1)[0]); markDirty(); repaint(); } } }),
+						el('button', { class: 'iconbtn', type: 'button', text: '⧉', title: 'Duplicate', onclick: function () { rows.splice(index + 1, 0, clone(row)); markDirty(); repaint(); } }),
+						el('button', { class: 'iconbtn iconbtn--danger', type: 'button', text: '✕', title: 'Remove', onclick: function () { if (confirm('Remove this item from the draft?')) { rows.splice(index, 1); markDirty(); repaint(); } } })
+					])
+				]));
+				card.appendChild(renderFields(field.fields || {}, row, ''));
+				wrap.appendChild(card);
+			});
+			wrap.appendChild(el('button', { class: 'btn repeater__add', type: 'button', text: '+ Add ' + label.toLowerCase().replace(/s$/, ''), onclick: function () {
+				var row = {};
+				Object.keys(field.fields || {}).forEach(function (k) { row[k] = defaultForField(field.fields[k]); });
+				rows.push(row);
+				parent[key] = rows;
+				markDirty(); repaint();
+			} }));
+		}
+		repaint();
+		return wrap;
+	}
+
+	function rowTitle(row, index) {
+		var keys = ['label', 'title', 'name', 'question', 'quote', 'text'];
+		for (var i = 0; i < keys.length; i++) {
+			if (typeof row[keys[i]] === 'string' && row[keys[i]].trim()) {
+				return row[keys[i]].length > 60 ? row[keys[i]].slice(0, 60) + '…' : row[keys[i]];
+			}
+		}
+		return 'Item ' + (index + 1);
+	}
+
+	/* ---------------- collection & record editors ---------------- */
+
+	function renderDocEditor(docKey) {
+		state.doc = docKey;
+		if (!ensureDraft(docKey)) { return el('p', { class: 'help', text: 'Loading…' }); }
+		var doc = state.docs[docKey];
+		if (doc.schema.type === 'collection') { return renderCollection(docKey, doc); }
+		return renderRecord(docKey, doc);
+	}
+
+	function renderCollection(docKey, doc) {
+		var wrap = el('div', { class: 'stack' });
+		var items = state.draft.items || (state.draft.items = []);
+		var fields = doc.schema.item_fields || {};
+		wrap.appendChild(el('div', { class: 'toolbar' }, [
+			el('span', { class: 'toolbar__hint', text: items.length + ' item' + (items.length === 1 ? '' : 's') + ' · drag ⠿ to reorder' }),
+			el('button', { class: 'btn btn--primary', type: 'button', text: '+ Add ' + (doc.schema.item_label || 'item'), onclick: function () {
+				var item = { id: Math.random().toString(36).slice(2, 9), visible: true };
+				Object.keys(fields).forEach(function (k) { item[k] = defaultForField(fields[k]); });
+				items.push(item); markDirty(); render();
+			} })
+		]));
+		if (!items.length) {
+			wrap.appendChild(el('div', { class: 'empty-state' }, [el('p', { text: 'Nothing here yet. This section stays hidden on the website until you add the first item.' })]));
+		}
+		items.forEach(function (item, index) {
+			var card = el('div', { class: 'collection' + (item.visible === false ? ' is-hidden' : ''), draggable: 'true' });
+			card.addEventListener('dragstart', function (event) { event.dataTransfer.setData('item-index', String(index)); });
+			card.addEventListener('dragover', function (event) { event.preventDefault(); card.classList.add('is-drop-target'); });
+			card.addEventListener('dragleave', function () { card.classList.remove('is-drop-target'); });
+			card.addEventListener('drop', function (event) {
+				event.preventDefault(); card.classList.remove('is-drop-target');
+				var from = parseInt(event.dataTransfer.getData('item-index'), 10);
+				if (isNaN(from) || from === index) { return; }
+				items.splice(index, 0, items.splice(from, 1)[0]); markDirty(); render();
+			});
+			card.appendChild(el('div', { class: 'collection__head' }, [
+				el('span', { class: 'drag', 'aria-hidden': 'true', text: '⠿' }),
+				el('span', { class: 'collection__title', text: item.title || item.question || item.name || ('Item ' + (index + 1)) }),
+				el('div', { class: 'tools' }, [
+					el('button', { class: 'iconbtn', type: 'button', title: item.visible === false ? 'Show on website' : 'Hide from website', text: item.visible === false ? '○' : '◉', onclick: function () { item.visible = item.visible === false; markDirty(); render(); } }),
+					el('button', { class: 'iconbtn', type: 'button', text: '↑', 'aria-label': 'Move up', onclick: function () { if (index > 0) { items.splice(index - 1, 0, items.splice(index, 1)[0]); markDirty(); render(); } } }),
+					el('button', { class: 'iconbtn', type: 'button', text: '↓', 'aria-label': 'Move down', onclick: function () { if (index < items.length - 1) { items.splice(index + 1, 0, items.splice(index, 1)[0]); markDirty(); render(); } } }),
+					el('button', { class: 'iconbtn', type: 'button', text: '⧉', 'aria-label': 'Duplicate', onclick: function () { var copy = clone(item); copy.id = Math.random().toString(36).slice(2, 9); items.splice(index + 1, 0, copy); markDirty(); render(); } }),
+					el('button', { class: 'iconbtn iconbtn--danger', type: 'button', text: '✕', 'aria-label': 'Delete', onclick: function () {
+						if (!confirm('Delete “' + (item.title || 'this item') + '”? It stays live until you publish.')) { return; }
+						items.splice(index, 1); markDirty(); render();
+						toast('Item removed from the draft. Publish to remove it from your live site.', 'info');
+					} })
+				])
+			]));
+			card.appendChild(renderFields(fields, item, ''));
+			wrap.appendChild(card);
+		});
+		return wrap;
+	}
+
+	function renderRecord(docKey, doc) {
+		var wrap = el('div', { class: 'stack' });
+		if (docKey === 'design') {
+			wrap.appendChild(el('div', { class: 'callout' }, [
+				el('strong', { text: 'Design safety: ' }),
+				el('span', { text: 'These tokens only override what you set. Everything empty inherits your active theme, so the approved TrustUsBro design is preserved.' })
+			]));
+		}
+		wrap.appendChild(renderFields(doc.schema.fields || {}, state.draft, ''));
+		return wrap;
+	}
+
+	/* ---------------- blog, seo, media, backups, revisions, health ---------------- */
+
+	function renderBlog() {
+		var wrap = el('div', { class: 'stack' });
+		var data = state.boot.blog;
+		wrap.appendChild(el('div', { class: 'toolbar' }, [
+			el('span', { class: 'toolbar__hint', text: 'Blog uses native WordPress posts, so URLs, feeds and SEO plugins keep working.' }),
+			el('button', { class: 'btn btn--primary', type: 'button', text: '+ New article', onclick: function () { toast('In WordPress this opens the article editor. Demo data is read-only.', 'info'); } })
+		]));
+		var table = el('table', { class: 'table' });
+		table.appendChild(el('thead', {}, [el('tr', {}, [
+			el('th', { text: 'Article' }), el('th', { text: 'Status' }), el('th', { text: 'Categories' }), el('th', { text: 'SEO' })
+		])]));
+		var body = el('tbody');
+		data.items.forEach(function (post) {
+			body.appendChild(el('tr', {}, [
+				el('td', {}, [el('strong', { text: post.title }), el('div', { class: 'help', text: post.date_label + ' · ' + post.author })]),
+				el('td', {}, [el('span', { class: 'pill ' + (post.status === 'publish' ? 'pill--ok' : 'pill--warn'), text: post.status_label })]),
+				el('td', { text: post.categories.map(function (c) { return c.name; }).join(', ') || '—' }),
+				el('td', {}, [el('span', { class: 'pill ' + (post.seo_title && post.seo_desc ? 'pill--ok' : 'pill--warn'), text: post.seo_title && post.seo_desc ? 'Set' : 'Missing' })])
+			]));
+		});
+		table.appendChild(body);
+		wrap.appendChild(table);
+		return wrap;
+	}
+
+	function renderSeo() {
+		var wrap = el('div', { class: 'stack' });
+		var report = state.boot.seoReport;
+		wrap.appendChild(el('div', { class: 'callout' }, [
+			el('strong', { text: report.prints_meta ? 'Site Manager handles SEO output. ' : 'Deferring to ' + report.other_plugins.join(', ') + '. ' }),
+			el('span', { text: report.prints_meta ? 'Titles, descriptions, Open Graph and schema are generated here, with no duplicate tags.' : 'No duplicate meta tags are printed.' })
+		]));
+		var stats = el('div', { class: 'stats' });
+		[['Articles & pages', report.posts, false], ['Missing SEO titles', report.missing_title, true], ['Missing descriptions', report.missing_desc, true], ['Images missing alt', report.missing_alt, true]].forEach(function (row) {
+			stats.appendChild(el('div', { class: 'stat' + (row[2] && row[1] ? ' is-warn' : '') }, [el('span', { class: 'stat__value', text: String(row[1]) }), el('span', { class: 'stat__label', text: row[0] })]));
+		});
+		wrap.appendChild(stats);
+		wrap.appendChild(el('p', { class: 'help', text: 'Existing URLs are never changed by Site Manager. Current permalink structure: ' + (report.urls_locked || 'plain') + '.' }));
+		if (ensureDraft('seo')) {
+			wrap.appendChild(el('h2', { class: 'h2', text: 'Site-wide defaults' }));
+			wrap.appendChild(renderFields(state.docs.seo.schema.fields, state.draft, ''));
+		}
+		return wrap;
+	}
+
+	function renderMedia() {
+		var wrap = el('div', { class: 'stack' });
+		wrap.appendChild(el('div', { class: 'callout' }, [
+			el('strong', { text: 'Media library: ' }),
+			el('span', { text: 'the demo export contains no image files, so this grid is empty. In WordPress this screen lists every image with alt text, dimensions, usage and a one-click "replace everywhere" action.' })
+		]));
+		wrap.appendChild(el('table', { class: 'table' }, [
+			el('thead', {}, [el('tr', {}, [el('th', { text: 'Capability' }), el('th', { text: 'Behaviour' })])]),
+			el('tbody', {}, [
+				el('tr', {}, [el('td', { text: 'Alt text' }), el('td', { text: 'Edit and save alt text per image; images without alt text are flagged.' })]),
+				el('tr', {}, [el('td', { text: 'Usage' }), el('td', { text: 'Shows which documents reference the image, draft and published.' })]),
+				el('tr', {}, [el('td', { text: 'Replace everywhere' }), el('td', { text: 'Swaps an image across all content; the old file is kept, never deleted.' })]),
+				el('tr', {}, [el('td', { text: 'Upload' }), el('td', { text: 'Uses the native Media Library with WordPress upload validation.' })])
+			])
+		]));
+		return wrap;
+	}
+
+	function renderBackups() {
+		var wrap = el('div', { class: 'stack' });
+		var data = state.boot.backups;
+		wrap.appendChild(el('div', { class: 'toolbar' }, [
+			el('span', { class: 'toolbar__hint', text: 'Backups run before every publish, daily, and on demand. Stored outside the plugin in wp-content/uploads/trustusbro-backups/.' }),
+			el('button', { class: 'btn btn--primary', type: 'button', text: 'Create backup now', onclick: function () { toast('A backup would be created here. Demo mode does not write files.', 'info'); } })
+		]));
+		var table = el('table', { class: 'table' });
+		table.appendChild(el('thead', {}, [el('tr', {}, [
+			el('th', { text: 'Created' }), el('th', { text: 'Reason' }), el('th', { text: 'Size' }), el('th', { text: 'By' }), el('th', { text: 'Actions' })
+		])]));
+		var body = el('tbody');
+		data.backups.forEach(function (b) {
+			body.appendChild(el('tr', {}, [
+				el('td', { text: b.created_label }), el('td', { text: b.reason }), el('td', { text: b.size_label }), el('td', { text: b.user_name }),
+				el('td', { class: 'table__actions' }, [
+					el('button', { class: 'btn btn--small', type: 'button', text: 'Restore', onclick: function () { toast('Restore creates a safety backup first, then imports the snapshot.', 'info'); } }),
+					el('button', { class: 'btn btn--small', type: 'button', text: 'Download', onclick: function () { toast('Downloads a JSON snapshot of all content.', 'info'); } })
+				])
+			]));
+		});
+		table.appendChild(body);
+		wrap.appendChild(table);
+		return wrap;
+	}
+
+	function renderRevisions() {
+		var wrap = el('div', { class: 'stack' });
+		wrap.appendChild(el('div', { class: 'callout' }, [
+			el('strong', { text: 'How versions work: ' }),
+			el('span', { text: 'every save stores a snapshot of the document. Restoring a version only changes the draft — you still press Publish to make it live, and a backup is created first.' })
+		]));
+		wrap.appendChild(el('table', { class: 'table' }, [
+			el('thead', {}, [el('tr', {}, [el('th', { text: 'When' }), el('th', { text: 'What' }), el('th', { text: 'Actions' })])]),
+			el('tbody', {}, [
+				el('tr', {}, [el('td', { text: 'Today, 09:12' }), el('td', { text: 'Published (Homepage)' }), el('td', { class: 'table__actions' }, [el('span', { class: 'pill pill--ok', text: 'Live now' })])]),
+				el('tr', {}, [el('td', { text: 'Today, 09:10' }), el('td', { text: 'Editing in dashboard' }), el('td', { class: 'table__actions' }, [el('button', { class: 'btn btn--small', type: 'button', text: 'Restore', onclick: function () { toast('Version restored into the draft. Publish when ready.', 'success'); } })])]),
+				el('tr', {}, [el('td', { text: 'Yesterday, 18:44' }), el('td', { text: 'Before publish (Homepage)' }), el('td', { class: 'table__actions' }, [el('button', { class: 'btn btn--small', type: 'button', text: 'Restore', onclick: function () { toast('Version restored into the draft. Publish when ready.', 'success'); } })])])
+			])
+		]));
+		return wrap;
+	}
+
+	function renderHealth() {
+		var wrap = el('div', { class: 'stack' });
+		var health = state.boot.health;
+		wrap.appendChild(el('div', { class: 'callout' + (health.ok ? '' : ' callout--attention') }, [
+			el('strong', { text: health.ok ? 'All requirements are met. ' : 'Some requirements need attention. ' }),
+			el('span', { text: health.ok ? 'Editing and publishing work normally. Content is stored in the WordPress database.' : 'Fix the items below for reliable editing.' })
+		]));
+		var table = el('table', { class: 'table' });
+		table.appendChild(el('thead', {}, [el('tr', {}, [el('th', { text: 'Check' }), el('th', { text: 'Found' }), el('th', { text: 'Needs' }), el('th', { text: 'Status' })])]));
+		var body = el('tbody');
+		Object.keys(health.checks).forEach(function (key) {
+			var c = health.checks[key];
+			body.appendChild(el('tr', {}, [el('td', { text: c.label }), el('td', { text: c.value }), el('td', { text: c.need }), el('td', {}, [el('span', { class: 'pill ' + (c.ok ? 'pill--ok' : 'pill--warn'), text: c.ok ? 'OK' : 'Action needed' })])]));
+		});
+		table.appendChild(body);
+		wrap.appendChild(table);
+		wrap.appendChild(el('h2', { class: 'h2', text: 'Environment' }));
+		wrap.appendChild(el('ul', { class: 'plainlist' }, [
+			el('li', { text: 'Theme: ' + health.theme.name + ' ' + health.theme.version + (health.theme.is_block ? ' (block theme)' : '') }),
+			el('li', { text: 'PHP: ' + health.php_version + ' · memory ' + health.memory_limit + ' · upload limit ' + health.max_upload }),
+			el('li', { text: 'SEO plugins detected: ' + (health.conflicts.length ? health.conflicts.join(', ') : 'none') })
+		]));
+		wrap.appendChild(el('h2', { class: 'h2', text: 'Quick help' }));
+		[
+			['Nothing appears on the site after publishing', 'Place the editable sections where you want them: enable "Use Site Manager sections for the front page" in Design settings, insert the "TrustUsBro page sections" block, or use the [trustusbro_page doc="home"] shortcode.'],
+			['I want to undo a change', 'Open Revision history, pick the version and press Restore. Nothing goes live until you publish.'],
+			['I already published a mistake', 'Open Backups and restore the snapshot that was taken automatically before publishing.'],
+			['Another SEO plugin is active', 'That is fine. Site Manager detects it and stops printing duplicate tags.'],
+			['Do I lose content if I disable the plugin?', 'No. All content lives in the WordPress database and is left untouched.']
+		].forEach(function (row) {
+			var details = el('details', { class: 'panel' }, [el('summary', { text: row[0] }), el('p', { text: row[1] })]);
+			wrap.appendChild(details);
+		});
+		return wrap;
+	}
+
+	/* ---------------- boot ---------------- */
+
+	document.addEventListener('keydown', function (event) {
+		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+			if (state.dirty) { event.preventDefault(); saveDraft(); }
+		}
+	});
+	window.addEventListener('beforeunload', function (event) {
+		if (state.dirty) { event.preventDefault(); event.returnValue = ''; return ''; }
+	});
+
+	loadData().then(function () {
+		state.doc = 'home';
+		render();
+	}).catch(function (error) {
+		q('#view-body').appendChild(el('div', { class: 'error', text: 'The demo data could not load: ' + error.message + '. Make sure demo-data.json sits next to this file.' }));
+	});
+})();
+</script>
+</body>
+</html>
